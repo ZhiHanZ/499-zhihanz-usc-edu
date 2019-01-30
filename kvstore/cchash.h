@@ -12,7 +12,7 @@ class ConcurrentHashTable {
   public: 
     ConcurrentHashTable(unsigned int num_buckets = default_buckets_)
 			:table_(num_buckets){
-      for(unsigned i = 0; i < num_buckets; ++i){
+      for (unsigned i = 0; i < num_buckets; ++i) {
 	table_[i].reset(new bucket_type);
       }
     }
@@ -41,16 +41,6 @@ class ConcurrentHashTable {
     auto& operator= (const ConcurrentHashTable& other) = delete;
     class bucket_type
     {
-      private:
-	typedef std::pair<Key, Value> bucket_value;
-	typedef std::list<bucket_value> bucket_data;
-	bucket_data data_;
-	typedef typename bucket_data::iterator bucket_iter;
-	mutable std::shared_mutex mutex; //c++ 17 feature
-	bucket_iter FindEntry(const Key& key){
-	  return std::find_if(data_.begin(), data_.end(), [&key](bucket_value \
-	  			const &item) {return item.first == key;});
-	}
       public:
         bool HasKey(const Key& key){
 	  std::shared_lock<std::shared_mutex> lock(mutex);
@@ -91,6 +81,16 @@ class ConcurrentHashTable {
 	     data_.erase(FindEntry(key));
 	   }
 	 }
+       private:
+	typedef std::pair<Key, Value> bucket_value;
+	typedef std::list<bucket_value> bucket_data;
+	bucket_data data_;
+	typedef typename bucket_data::iterator bucket_iter;
+	mutable std::shared_mutex mutex; //c++ 17 feature
+	bucket_iter FindEntry(const Key& key){
+	  return std::find_if(data_.begin(), data_.end(), [&key](bucket_value \
+	  			const &item) {return item.first == key;});
+	}
      };
      std::vector<std::unique_ptr<bucket_type>> table_;
      Hash hash_;
@@ -99,6 +99,7 @@ class ConcurrentHashTable {
        std::size_t const index_ = hash_(key)%table_.size();
        return *table_[index_];
      }
+   
 };
 #endif //CC_HASH_H_
 
