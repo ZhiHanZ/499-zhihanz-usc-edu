@@ -45,7 +45,7 @@ class ConcurrentHashTable {
    //do not allow copy operation
     ConcurrentHashTable(const ConcurrentHashTable& other) = delete;
     auto& operator= (const ConcurrentHashTable& other) = delete;
-    class bucket_type
+    class BucketType
     {
       public:
         bool HasKey(const Key& key){
@@ -101,7 +101,7 @@ class ConcurrentHashTable {
      std::vector<std::unique_ptr<bucket_type>> table_;
      Hash hash_;
      int64_t default_buckets_ = 19;
-     bucket_type& GetBucket(const Key& key) const {
+     BucketType& GetBucket(const Key& key) const {
        std::size_t const index_ = hash_(key)%table_.size();
        return *table_[index_];
      }
