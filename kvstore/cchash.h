@@ -10,28 +10,34 @@
 template<typename Key, typename Value, typename Hash=std::hash<Key>>
 class ConcurrentHashTable {
   public: 
+    //Consstruct a hash table with its default size is 19.
     ConcurrentHashTable(unsigned int num_buckets = default_buckets_)
 			:table_(num_buckets){
       for (unsigned i = 0; i < num_buckets; ++i) {
 	table_[i].reset(new bucket_type);
       }
     }
-    
+    //Get value corresponding to the key;
     Value GetValue(const Key& key){
       return GetBucket(key).GetValue(key);
     }
+    //Get value corresponding to the key, if there is no value, return default value(second param).
     Value GetValue(const Key& key, const Value& val){
       return  GetBucket(key).GetValue(key, val);
     }
+    //Add key value pair. if keys exists return false
     bool Add(const Key& key, const Value& val){
       return GetBucket(key).AddValue(key, val);
     }
+    //check whether table has key
     bool Has(const Key& key){
       return GetBucket(key).HasKey(key);
     }
+    //Add or Update key value pair
     void AddOrUpdate(const Key& key, const Value& val) {
       GetBucket(key).AddOrUpdateValue(key, val);
     }
+    //delete key.
     void DeleteKey(const Key& key) {
       GetBucket(key).DeleteKey(key);
     }
