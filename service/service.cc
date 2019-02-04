@@ -50,6 +50,7 @@ const static std::string ID_CHIRP("id_chirp: ");
 const static std::string ID_REPLY("id_reply: ");
 class ServiceImpl final : public ServiceLayer::Service {
   public:
+    //register a user
     Status registeruser (ServerContext* context,
                          const RegisterRequest* request, RegisterReply* reply) override{
       KeyValueStoreClient client(
@@ -65,12 +66,14 @@ class ServiceImpl final : public ServiceLayer::Service {
       if (!status2.ok()) return status2;
       return Status::OK;
     }
+    //Get the most recent published chirp id through name
     auto GetUserId(const string& username){
       KeyValueStoreClient client(
             grpc::CreateChannel("localhost:50000"
             , grpc::InsecureChannelCredentials()));
       return client.GetValue(USER_ID + username);
     }
+    //Get a vector of the people the user followed
     auto GetUserFollowed(const string& username) {
       KeyValueStoreClient client(
             grpc::CreateChannel("localhost:50000"
@@ -78,6 +81,7 @@ class ServiceImpl final : public ServiceLayer::Service {
       auto followstr = client.GetValue(USER_FOLLOWED + username);
       return parser::Deparser(followstr);
     }
+    //Get the replied id vector through id
     auto GetIdReply(const string& id){
       KeyValueStoreClient client(
             grpc::CreateChannel("localhost:50000"
@@ -86,12 +90,14 @@ class ServiceImpl final : public ServiceLayer::Service {
       if (replystr == "") return vector<string>{};
       return parser::Deparser(replystr);
     }
+    //Get the chirp string through id 
     auto GetIdChirp(const string& id) {
       KeyValueStoreClient client(
             grpc::CreateChannel("localhost:50000"
             , grpc::InsecureChannelCredentials()));
       return client.GetValue(ID_CHIRP + id);
     }
+    //Make Chirp string
     string ChirpStringMaker(const string& username, 
                             const string& text, 
                             const string& parent_id){
@@ -101,6 +107,7 @@ class ServiceImpl final : public ServiceLayer::Service {
                                           parent_id, pair.first);
       return chirpstring;
     } 
+    //chirp 
     Status chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* reply)override {
       KeyValueStoreClient client(grpc::CreateChannel(
                                  "localhost:50000", 
@@ -143,6 +150,7 @@ class ServiceImpl final : public ServiceLayer::Service {
       }
       return Status::OK;
     }
+    //let user follow to_follow
     Status follow(ServerContext* context, const FollowRequest* request, FollowReply* reply) override {
       KeyValueStoreClient client(grpc::CreateChannel(
                                  "localhost:50000", 
@@ -169,6 +177,7 @@ class ServiceImpl final : public ServiceLayer::Service {
       auto new_reply = client.PutOrUpdate(user, new_fork);
       return Status::OK;
     }
+    //read a chirp thread through BFS
     Status read(ServerContext* context, 
                 const ReadRequest* request, 
                 ReadReply* reply)override	{
@@ -202,6 +211,7 @@ class ServiceImpl final : public ServiceLayer::Service {
       }
       return Status::OK;
     }
+    //Watching on currently updated followed people's activities
     Status monitor(ServerContext* context, 
                    const MonitorRequest* request, 
                    ServerWriter<MonitorReply>* reply) override {
