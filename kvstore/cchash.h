@@ -48,19 +48,24 @@ class ConcurrentHashTable {
     class BucketType
     {
        public:
+         //return whether buckey contains given key
          bool HasKey(const Key& key){
            std::shared_lock<std::shared_mutex> lock(mutex);
            return (FindEntry(key) == data_.end())? false: true;
          }		
 			 //pre: Has Key in hash table
+       //Get Value without check on whether it exists
          Value GetValue(const Key& key){
            std::shared_lock<std::shared_mutex> lock(mutex);
            return FindEntry(key)->second;
          }
+         //Get Value and if key do not exists, return a default value.
          Value GetValue(const Key& key, const Key& default_val){
            std::shared_lock<std::shared_mutex> lock(mutex);
            return (FindEntry(key) == data_.end())? default_val: FindEntry(key)->second;
          }
+         //Add Value by using a key value pair, if they key exists
+         //return false
          bool AddValue(const Key& key, const Value& value) {
            std::unique_lock<std::shared_mutex> lock(mutex);
            bucket_iter iter_ = FindEntry(key);
@@ -72,6 +77,8 @@ class ConcurrentHashTable {
              return false;
            }
          }
+         //Add Value by using a key value pair, and if key exists,
+         //Update value
          void AddOrUpdateValue(const Key& key, const Value& value){
            std::unique_lock<std::shared_mutex> lock(mutex);
            bucket_iter iter_ = FindEntry(key);
@@ -81,6 +88,7 @@ class ConcurrentHashTable {
              data_.push_back(make_pair(key, value));
            }
          }
+         //Delete a value through key
          void DeleteKey(const Key& key) {
            std::unique_lock<std::shared_mutex> lock(mutex);
            if (FindEntry(key) != data_.end()) {
@@ -101,6 +109,7 @@ class ConcurrentHashTable {
     std::vector<std::unique_ptr<BucketType>> table_;
     Hash hash_;
     const static unsigned default_buckets_ = 19;
+    //Get the bucket through hash value;
     BucketType& GetBucket(const Key& key) const {
     std::size_t const index_ = hash_(key)%table_.size();
       return *table_[index_];
