@@ -60,7 +60,7 @@ class KeyValueStoreClient {
     }
   }
   // Put or Update given key value pair to database
-  Status PutOrUpdate(std::string key, std::string value) {
+  Status PutOrUpdate(const std::string& key, const std::string& value) {
     PutRequest request;
     request.set_key(key);
     request.set_value(value);
@@ -71,7 +71,7 @@ class KeyValueStoreClient {
   }
   // Put the given key value pair to database
   // If database has given key return StautusCode:;ALREADY_EXISTS status
-  Status Put(std::string key, std::string value) {
+  Status Put(const std::string& key, const std::string& value) {
     if (Has(key).ok()) {
       return Status(StatusCode::ALREADY_EXISTS, "key exists");
     }
@@ -98,7 +98,7 @@ class KeyValueStoreClient {
     return response.value();
   }
   // Return the status shows that whether database has such key
-  Status Has(std::string key) {
+  Status Has(const std::string& key) {
     ClientContext context;
     auto stream = stub_->get(&context);
     GetRequest request;
@@ -112,7 +112,7 @@ class KeyValueStoreClient {
     return status;
   }
   // Delete a key value pair in databse through key
-  Status Delete(std::string key) {
+  Status Delete(const std::string& key) {
     DeleteRequest request;
     request.set_key(key);
     DeleteReply reply;
