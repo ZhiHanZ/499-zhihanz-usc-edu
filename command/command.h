@@ -3,71 +3,32 @@
 #include"command_helper.h"
 
 using namespace helper;
+
+//Command class supports commmand line api including 
+//Supports
+//register a user through given username
+//post or reply to chirps
+//let one user follow another user
+//read the chirp thread from given chirp id 
+//monitor the chirp on those people given user followed
 class CommandClient {
   public:
     CommandClient(std::shared_ptr<Channel> channel)
       : stub_(ServiceLayer::NewStub(channel)) {}
-    //Register a user
-    Status RegisterUser(const string& registeruser){
-      if(registeruser == "")
-        return Status(StatusCode::ALREADY_EXISTS, "there should be at least one chararter for reg");
-
-      ClientContext context;
-      RegisterRequest* request = new RegisterRequest;
-      request->set_username(registeruser);
-      RegisterReply reply;
-      Status status = stub_->registeruser(&context, *request, &reply);
-      if (!status.ok()) {
-        cout << status.error_message() << endl;
-      }
-      return status;
-    }
-    //Post a chirp
-    Chirp ChirpPost(const string& username, const string& chirp, const string& reply){
-      ClientContext context;
-      auto request = ChirpRequestMaker(username, chirp, reply);
-      auto chirply = new ChirpReply;
-      auto response =  stub_->chirp(&context, *request, chirply);
-      if(!response.ok()) {
-        cout << response.error_message() << endl;
-      }
-      return chirply->chirp();
-    }
-    //follow to_follow 
-    auto Follow(const string& username, const string& to_follow) {
-      auto request = FollowRequestMaker(username, to_follow);
-      FollowReply reply;
-      ClientContext context;
-      auto status = stub_->follow(&context, *request, &reply);
-      return status;
-    }
-    //read a chirp thread
-    auto Read(const string& id){
-      auto request = ReadRequestMaker(id);
-      ClientContext context;
-      ReadReply* reply = new ReadReply;
-      auto status = stub_->read(&context, *request, reply);
-      if(!status.ok()){
-        cout << status.error_message() << endl;
-      }
-      return *reply;
-    }
-    //monitor a people
-    void Monitor(const string& username) {
-      ClientContext context;
-      auto request = MonitorRequestMaker(username);
-      auto stream  = stub_->monitor(&context, *request);
-      MonitorReply* reply = new MonitorReply;
-      while(stream->Read(reply)){
-        //will stream block thread and wait for response after received a response
-        //sent it to reply?
-        printChirp(reply->chirp());
-      }
-      auto status = stream->Finish();
-      if (!status.ok()){
-        cout <<status.error_message() << endl;
-      }
-    }
+    //Register a user through given username
+    //If user already registered, return StatusCode::ALREADY_EXISTS
+    Status RegisterUser(const string& registeruser);    
+    //Post a chirp based on username, chirp text, and its parent id
+    //Return the posted chirp 
+    Chirp ChirpPost(const string& username, const string& chirp, const string& reply);
+    //follow allow user to follow another one
+    //return a status whether follow is successful
+    auto Follow(const string& username, const string& to_follow);
+    //read a chirp thread given a chirp id
+    //return a chirp array
+    auto Read(const string& id);
+    //monitor the chirp on those people given user followed
+    void Monitor(const string& username);
   private:
     std::unique_ptr<ServiceLayer::Stub> stub_;
 
