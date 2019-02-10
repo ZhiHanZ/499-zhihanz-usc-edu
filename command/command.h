@@ -3,6 +3,7 @@
 #include"command_helper.h"
 
 using namespace helper;
+using namespace formatChirp;
 
 //Command class supports commmand line api including 
 //Supports

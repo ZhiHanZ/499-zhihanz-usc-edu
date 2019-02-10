@@ -86,6 +86,8 @@ namespace helper {
     request->set_username(user);
     return request;
   }
+}
+namespace formatChirp {
   //print formated chirp
   static void printChirp(const Chirp& chirp) {
     LOG(INFO) << "username: " << chirp.username();
