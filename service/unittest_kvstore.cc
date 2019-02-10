@@ -7,9 +7,46 @@
 #include "../kvstore/cchash.h"
 #include"kvstore.pb.h"
 
-using namespace UnitTest;
 using chirp::GetReply;
 using namespace std;
+
+namespace UnitTest {
+using namespace std;
+// The kvstore client which is used for unittest
+// Support Put, PutOrUpdate, GetValue through key, Delete key value pair through
+// key operations
+class UnitTestKVClient {
+ public:
+  UnitTestKVClient() : table_{} {}
+  // Put or update the key value pair in key value store
+  bool PutOrUpdate(std::string key, std::string value) {
+    table_.AddOrUpdate(key, value);
+    return true;
+  }
+  // Put the key value pair into key value store
+  // If store has given key return false
+  bool Put(std::string key, std::string value) {
+    if (table_.Has(key)) return false;
+    table_.Add(key, value);
+    return true;
+  }
+  // Get the value of corresponding key
+  string GetValue(const std::string& key) {
+    string response = table_.GetValue(key);
+    return response;
+  }
+  // return whether key value store has such key
+  bool Has(std::string key) { return table_.Has(key); }
+  // delete corresponding key value pair through key
+  bool Delete(std::string key) {
+    table_.DeleteKey(key);
+    return true;
+  }
+
+  ConcurrentHashTable<string, string> table_;
+};
+}
+using namespace UnitTest;
 
 ConcurrentHashTable<string, string> table{};
 UnitTestKVClient client{};
