@@ -49,11 +49,57 @@ using grpc::Status;
 using grpc::StatusCode;
 using namespace std;
 using namespace google::protobuf;
+using namespace std::this_thread;
+using namespace std::chrono;
+using namespace std::chrono_literals;
+using namespace helper;
+
+namespace UnitTest {
+using namespace std;
+// The kvstore client which is used for unittest
+// Support Put, PutOrUpdate, GetValue through key, Delete key value pair through
+// key operations
+class UnitTestKVClient {
+ public:
+  UnitTestKVClient() : table_{} {}
+  // Put or update the key value pair in key value store
+  bool PutOrUpdate(std::string key, std::string value) {
+    table_.AddOrUpdate(key, value);
+    return true;
+  }
+  // Put the key value pair into key value store
+  // If store has given key return false
+  bool Put(std::string key, std::string value) {
+    if (table_.Has(key)) return false;
+    table_.Add(key, value);
+    return true;
+  }
+  // Get the value of corresponding key
+  string GetValue(const std::string& key) {
+    string response = table_.GetValue(key);
+    return response;
+  }
+  // return whether key value store has such key
+  bool Has(std::string key) { return table_.Has(key); }
+  // delete corresponding key value pair through key
+  bool Delete(std::string key) {
+    table_.DeleteKey(key);
+    return true;
+  }
+
+  ConcurrentHashTable<string, string> table_;
+};
+}
 using namespace UnitTest;
 
-
+//This class is the counterpart of original service file in service.h
+//Do not use any GRPC communication just used requests and string as Fake service
+//For Unit Test Only
 class FakeService {
   public:
+    //Get the request user name and send it to client_ database. 
+    //If register succcessed, return FakeCode{OK}
+    //else return FakeCode{{NOT_FOUND}
     FakeCode registeruser(const string request,
                            string reply,
                            UnitTestKVClient& client_){
@@ -66,21 +112,26 @@ class FakeService {
       if (status2 == false) return FakeCode{NOT_FOUND};
       return FakeCode{OK};
     }
+    //Get the most recent published chirp id for given user in fake database
     auto GetUserId(const string& username, UnitTestKVClient& client_){
       return client_.GetValue(USER_ID + username);
     }
+    //Get the vector of followed user given username
     auto GetUserFollowed(const string& username, UnitTestKVClient& client_) {
       auto followstr = client_.GetValue(USER_FOLLOWED + username);
       return parser::Deparser(followstr);
     }
+    //Get all chirp ids replied to one chirp as a vector
     auto GetIdReply(const string& id,  UnitTestKVClient& client_){
       auto replystr = client_.GetValue(ID_REPLY + id);
       if (replystr == "") return vector<string>{};
       return parser::Deparser(replystr);
     }
+    //Get the chirp corresponding to a chirp id
     auto GetIdChirp(const string& id, UnitTestKVClient& client_) {
       return client_.GetValue(ID_CHIRP + id);
     }
+    //make a chirp string through username, text and parent_id
     string ChirpStringMaker(const string& username, 
                    const string& text, 
                    const string& parent_id){
@@ -90,6 +141,8 @@ class FakeService {
                                       parent_id, pair.first);
       return chirpstring;
     } 
+    //make a chirp or reply to a chirp through reuqests and store them into databse
+    //return the status if send requests successfully return FakeCode{OK}
     FakeCode chirp(const ChirpRequest* request,
                    ChirpReply* reply,
                    UnitTestKVClient& client_){
@@ -124,6 +177,7 @@ class FakeService {
       }
       return FakeCode{OK};
     }
+    //Get the username and to_follow username, let user follow the to_follow people
     FakeCode follow(const FollowRequest* request, UnitTestKVClient& client_) {
       auto has_or_not = client_.Has(USER_FOLLOWED + request->username());
       if(!has_or_not) return FakeCode{NOT_FOUND};
@@ -143,6 +197,7 @@ class FakeService {
       auto new_reply = client_.PutOrUpdate(user, new_fork);
       return FakeCode{OK};
     }
+    //read a chirp thread given chirp id through breadth first search
     FakeCode read(const ReadRequest* request, ReadReply* reply, UnitTestKVClient& client_) {
       auto readid = request->chirp_id();
       if (!client_.Has(ID_CHIRP + request->chirp_id()))
@@ -170,13 +225,10 @@ class FakeService {
       }
       return FakeCode{OK};
     }
+    //Monitor the followed people's chirp given one username
     FakeCode monitor(const MonitorRequest* request,
                      MonitorReply* reply,
                      UnitTestKVClient& client_){
-      using namespace std::this_thread;
-      using namespace std::chrono;
-      using namespace std::chrono_literals;
-      using namespace helper;
       signal(SIGINT, signal_handler);
       auto time_interval = 30ms;
       auto curr = GetMicroSec();
