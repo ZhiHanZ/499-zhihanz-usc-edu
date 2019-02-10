@@ -6,6 +6,36 @@
 #include "kvstore_client.h"
 #include "../kvstore/cchash.h"
 #include"kvstore.pb.h"
+
+namespace UnitTest {
+using namespace std;
+// This is a client implemented for unittest
+class UnitTestKVClient {
+ public:
+  UnitTestKVClient() : table_{} {}
+  bool PutOrUpdate(std::string key, std::string value) {
+    table_.AddOrUpdate(key, value);
+    return true;
+  }
+  bool Put(std::string key, std::string value) {
+    if (table_.Has(key)) return false;
+    table_.Add(key, value);
+    return true;
+  }
+  string GetValue(const std::string& key) {
+    string response = table_.GetValue(key);
+    return response;
+  }
+  bool Has(std::string key) { return table_.Has(key); }
+  bool Delete(std::string key) {
+    table_.DeleteKey(key);
+    return true;
+  }
+
+  ConcurrentHashTable<string, string> table_;
+};
+
+}  // namespace UnitTest
 using namespace UnitTest;
 using chirp::GetReply;
 using namespace std;
