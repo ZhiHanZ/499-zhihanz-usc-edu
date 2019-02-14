@@ -8,7 +8,7 @@ PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 PROTOS_PATH = ../protoc
-all: unittest_cchash unittest_kvhelper kvstore
+all: service.pb.cc kvstore.pb.cc unittest_cchash unittest_kvhelper kvstore
 kvstore.grpc.pb.cc: ../protoc/kvstore.proto
 	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 service.grpc.pb.cc: ../protoc/service.proto
