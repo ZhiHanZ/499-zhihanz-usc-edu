@@ -34,4 +34,31 @@ In the root
 cd command
 make
 ```
+# How to use?
+## Registration:
+If I want to regist with a name like Adam
+In `root/command/` file
+```
+./command -regist=Adam
+```
+## How to Chirp(send message):
+If I want to chirp some thing like Hellow World with a name like Adam
+In `root/command/` file
+```
+./command -user=Adam -chirp="Hello World"
+```
+**If user do not exists, It will return a blank chirp with a hint like**
+user name do not exists
+
+## How to reply to other chirp:
+If I want to chirp some thing like Hellow Adam with a name like Rick and reply this message to a given id like 6501687367827456
+This ID is send to the user as a part of chirp reply
+In `root/command/` file
+```
+./command -user=Morty -chirp="Hello Adam" -reply="6501687367827456"
+```
+## How to follow a given guy?
+If your user name is Adam and want to follow Morty.
+In `root/command/` file
+```
 
