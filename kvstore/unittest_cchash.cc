@@ -1,8 +1,8 @@
 #include "cchash.h"
 #include <gtest/gtest.h>
 #include <iostream>
-
 #include <string>
+
 ConcurrentHashTable<std::string, std::string> hs;
 // test whether test can be inited successfully
 TEST(test, init) { ASSERT_EQ(hs.GetValue("test2", "undefined"), "undefined"); }
