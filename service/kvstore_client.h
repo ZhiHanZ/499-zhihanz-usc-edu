@@ -1,16 +1,16 @@
 #ifndef KVSTORE_CLIENT_H_
 #define KVSTORE_CLIENT_H_
 
-#include <grpcpp/grpcpp.h>
-#include <iostream>
-#include <memory>
-#include <string>
-#include <vector>
 #include "../kvstore/cchash.h"
 #include "../service/service_helper.h"
 #include "kvstore.grpc.pb.h"
 #include "kvstore.pb.h"
 #include "service.pb.h"
+#include <grpcpp/grpcpp.h>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 using chirp::Chirp;
 using chirp::DeleteReply;
@@ -32,18 +32,18 @@ using grpc::StatusCode;
 // given key and delete key value pair through given in key value store
 // operations
 class KeyValueStoreClient {
- public:
+public:
   KeyValueStoreClient(std::shared_ptr<Channel> channel)
       : stub_(KeyValueStore::NewStub(channel)) {}
 
   // Requests each key in the vector and displays the key and its corresponding
   // value as a pair
-  void GetValues(const std::vector<std::string>& keys) {
+  void GetValues(const std::vector<std::string> &keys) {
     // Context for the client. It could be used to convey extra information to
     // the server and/or tweak certain RPC behaviors.
     ClientContext context;
     auto stream = stub_->get(&context);
-    for (const auto& key : keys) {
+    for (const auto &key : keys) {
       // Key we are sending to the server.
       GetRequest request;
       request.set_key(key);
@@ -60,7 +60,7 @@ class KeyValueStoreClient {
     }
   }
   // Put or Update given key value pair to database
-  Status PutOrUpdate(const std::string& key, const std::string& value) {
+  Status PutOrUpdate(const std::string &key, const std::string &value) {
     PutRequest request;
     request.set_key(key);
     request.set_value(value);
@@ -71,7 +71,7 @@ class KeyValueStoreClient {
   }
   // Put the given key value pair to database
   // If database has given key return StautusCode:;ALREADY_EXISTS status
-  Status Put(const std::string& key, const std::string& value) {
+  Status Put(const std::string &key, const std::string &value) {
     if (Has(key).ok()) {
       return Status(StatusCode::ALREADY_EXISTS, "key exists");
     }
@@ -84,7 +84,7 @@ class KeyValueStoreClient {
     return status;
   }
   // Get the value through key in key value store
-  std::string GetValue(const std::string& key) {
+  std::string GetValue(const std::string &key) {
     ClientContext context;
     auto stream = stub_->get(&context);
     GetRequest request;
@@ -98,7 +98,7 @@ class KeyValueStoreClient {
     return response.value();
   }
   // Return the status shows that whether database has such key
-  Status Has(const std::string& key) {
+  Status Has(const std::string &key) {
     ClientContext context;
     auto stream = stub_->get(&context);
     GetRequest request;
@@ -112,7 +112,7 @@ class KeyValueStoreClient {
     return status;
   }
   // Delete a key value pair in databse through key
-  Status Delete(const std::string& key) {
+  Status Delete(const std::string &key) {
     DeleteRequest request;
     request.set_key(key);
     DeleteReply reply;
@@ -121,7 +121,7 @@ class KeyValueStoreClient {
     return status;
   }
 
- private:
+private:
   std::unique_ptr<KeyValueStore::Stub> stub_;
 };
 #endif
