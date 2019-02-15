@@ -165,6 +165,7 @@ Status ServiceImpl::monitor(ServerContext *context,
     return Status::OK;
   }
   while (true) {
+    followed = GetUserFollowed(request->username());
     std::this_thread::sleep_for(time_interval);
     for (const auto &f : followed) {
       auto curr_id = GetUserId(f);
