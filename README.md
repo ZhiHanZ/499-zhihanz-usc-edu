@@ -7,6 +7,15 @@ email: zhihanz@usc.edu
 Using the Vagrantfile in root directory.
 Run `vagrant up`
 It will automaticly deploy a native virtual machine for you
+**sometims it may not automatically install grpc for you**
+run the command below to install grpc
+```
+git clone -b $(curl -L http://grpc.io/release) https://github.com/grpc/grpc
+cd grpc
+git submodule update --init
+make
+sudo make install prefix=/usr/local/
+```
 # How to compile?
 ## kvstore
 compile:
