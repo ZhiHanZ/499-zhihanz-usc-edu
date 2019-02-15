@@ -61,4 +61,12 @@ In `root/command/` file
 If your user name is Adam and want to follow Morty.
 In `root/command/` file
 ```
+./command -user=Adam -follow=Morty
+```
+## How to monitor a given people?
+If you want to monitor Adam
+In `root/command/` file
+```
+./command -user=Adam -monitor
+```
 
