@@ -3,6 +3,7 @@ name: Zhihan Zhang
 ---------------
 
 email: zhihanz@usc.edu
+review: Barath, pinghaoluo
 # How to deploy and setup?
 Using the Vagrantfile in root directory.
 Run `vagrant up`
