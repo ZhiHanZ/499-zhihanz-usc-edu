@@ -1,14 +1,20 @@
-#ifndef UNIQUE_ID_H_
-#define UNIQUE_ID_H_
-#include "service.pb.h"
+#ifndef SERVICE_UNIQUE_ID_H_
+#define SERVICE_UNIQUE_ID_H_
 #include <atomic>
 #include <chrono>
 #include <mutex>
 #include <string>
+#include <utility>
+#include "service.pb.h"
 
 using chirp::Timestamp;
-using namespace std::chrono;
-using namespace std;
+using std::mutex;
+using std::string;
+using std::lock_guard;
+using std::chrono::duration_cast;
+using std::chrono::microseconds;
+using std::chrono::seconds;
+using std::chrono::system_clock;
 
 namespace Id {
 // Get current micro second
@@ -23,7 +29,7 @@ static int64_t GetSec() {
 }
 // This is a unique id generator
 class IdGenerator {
-public:
+ public:
   IdGenerator() : sequence_(0) {}
   // Get a Unique id using the machine code of given server(optional)
   string GetId(int64_t machine_code) {
@@ -46,10 +52,10 @@ public:
     return make_pair(time, GetId(machine_code));
   }
 
-private:
+ private:
   int64_t sequence_ = 0;
   Timestamp time;
   mutex id_mutex;
 };
-} // namespace Id
-#endif // UNIQUE_ID_H_
+}  // namespace Id
+#endif  // SERVICE_UNIQUE_ID_H_

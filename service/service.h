@@ -1,19 +1,19 @@
-#ifndef SERVICE_H_
-#define SERVICE_H_
+#ifndef SERVICE_SERVICE_H_
+#define SERVICE_SERVICE_H_
+#include <google/protobuf/message.h>
+#include <grpcpp/grpcpp.h>
+#include <algorithm>
+#include <iostream>
+#include <memory>
+#include <queue>
+#include <string>
+#include <vector>
 #include "kvstore.grpc.pb.h"
 #include "kvstore.pb.h"
 #include "kvstore_client.h"
 #include "service.grpc.pb.h"
 #include "service.pb.h"
 #include "service_helper.h"
-#include <algorithm>
-#include <google/protobuf/message.h>
-#include <grpcpp/grpcpp.h>
-#include <iostream>
-#include <memory>
-#include <queue>
-#include <string>
-#include <vector>
 
 using chirp::Chirp;
 using chirp::ChirpReply;
@@ -44,16 +44,12 @@ using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
 using grpc::StatusCode;
-using namespace google::protobuf;
-using namespace std::this_thread;
-using namespace std::chrono;
-using namespace std::chrono_literals;
-using namespace helper;
 
-const static std::string USER_ID("user_id: ");
-const static std::string USER_FOLLOWED("user_followed: ");
-const static std::string ID_CHIRP("id_chirp: ");
-const static std::string ID_REPLY("id_reply: ");
+static const char USER_ID[]{"user_id: "};
+static const char USER_FOLLOWED[]{"user_followed: "};
+static const char ID_CHIRP[]{"id_chirp: "};
+static const char ID_REPLY[]{"id_reply: "};
+
 
 // This class contains all API service can proivde through grpc including
 // Register a user to key value store
@@ -62,7 +58,7 @@ const static std::string ID_REPLY("id_reply: ");
 // Follow a chirp user
 // Monitor the chirp of followed user
 class ServiceImpl final : public ServiceLayer::Service {
-public:
+ public:
   // register a user by accepting register request and send feedbacks
   Status registeruser(ServerContext *context, const RegisterRequest *request,
                       RegisterReply *reply) override;
@@ -95,7 +91,7 @@ public:
   Status monitor(ServerContext *context, const MonitorRequest *request,
                  ServerWriter<MonitorReply> *reply) override;
 
-private:
+ private:
   IdGenerator idG;
 };
-#endif
+#endif  //  SERVICE_SERVICE_H_
