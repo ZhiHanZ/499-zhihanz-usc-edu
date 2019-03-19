@@ -1,4 +1,9 @@
 #include "command.h"
+using formatChirp::printChirp;
+using helper::ChirpRequestMaker;
+using helper::FollowRequestMaker;
+using helper::MonitorRequestMaker;
+using helper::ReadRequestMaker;
 // Regist a user given a username
 Status CommandClient::RegisterUser(const string &registeruser) {
   if (registeruser == "")
