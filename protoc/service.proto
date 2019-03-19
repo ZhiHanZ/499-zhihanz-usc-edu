@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package chirp;
+
+// Time as given by Linux gettimeofday().
+message Timestamp {
+  int64 seconds = 1;  // Seconds since beginning of UNIX epoch.
+  int64 useconds = 2;  // Microseconds since beginning of UNIX epoch.
+}
+
+message Chirp {
+  string username = 1;  // The user who posted this chirp.
+  string text = 2;  // The contents of the chirp.
+  bytes id = 3;  // The ID of this chirp.
+  bytes parent_id = 4;  // The ID, if any, of the chirp this is in reply to.
+  Timestamp timestamp = 5;  // The time this chirp was posted.
+}
+
+message RegisterRequest {
+  string username = 1;
+}
+
+message RegisterReply {
+  // Empty because success/failure is signaled via GRPC status.
+}
+
+message ChirpRequest {
+  string username = 1;
+  string text = 2;  // The contents of the new chirp to be posted.
+  bytes parent_id = 3;  // The ID of the chirp this is in response to.
+}
+
+message ChirpReply {
+  Chirp chirp = 1;  // Returns the stored chirp.
+}
+message FollowRequest {
+  string username = 1;
+  string to_follow = 2;  // The username of the other user to follow.
+}
+
+message FollowReply {
+  // Empty because success/failure is signaled via GRPC status.
+}
+
+message ReadRequest {
+  bytes chirp_id = 1;  // The ID of the chirp to start the read at.
+}
+
+message ReadReply {
+  repeated Chirp chirps = 1;  // The requested chirp thread.
+}
+
+message MonitorRequest {
+  string username = 1;
+}
+
+message MonitorReply {
+  Chirp chirp = 1;
+}
+
+service ServiceLayer {
+  rpc registeruser (RegisterRequest) returns (RegisterReply) {}
+  rpc chirp (ChirpRequest) returns (ChirpReply) {}
+  rpc follow (FollowRequest) returns (FollowReply) {}
+  rpc read (ReadRequest) returns (ReadReply) {}
+  rpc monitor (MonitorRequest) returns (stream MonitorReply) {}
+}
+
