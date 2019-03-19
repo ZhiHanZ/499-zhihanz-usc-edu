@@ -1,8 +1,8 @@
-#include "cchash.h"
-#include "kvhelper.h"
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
+#include "cchash.h"
+#include "kvhelper.h"
 
 ConcurrentHashTable<std::string, std::string> hs;
 // test the put method naively
