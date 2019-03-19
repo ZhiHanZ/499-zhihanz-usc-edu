@@ -1,13 +1,13 @@
-#include "cchash.h"
-#include "kvhelper.h"
-#include "kvstore.grpc.pb.h"
-#include "kvstore.pb.h"
-#include <algorithm>
 #include <grpcpp/grpcpp.h>
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include "cchash.h"
+#include "kvhelper.h"
+#include "kvstore.grpc.pb.h"
+#include "kvstore.pb.h"
 
 using chirp::DeleteReply;
 using chirp::DeleteRequest;
@@ -22,7 +22,9 @@ using grpc::ServerContext;
 using grpc::ServerReaderWriter;
 using grpc::Status;
 using grpc::StatusCode;
-using namespace helper;
+using helper::Delete;
+using helper::Get;
+using helper::Put;
 // store all variables in database
 ConcurrentHashTable<std::string, std::string> database;
 // support put(key, value), get(key), delete(key) operation
@@ -52,6 +54,7 @@ class KeyValueStoreImp1 final : public KeyValueStore::Service {
         return Status(StatusCode::ALREADY_EXISTS, "key does not exist.");
       }
     }
+    return Status::OK;
   }
   // delete a key . if key do not exists, return a error
   Status deletekey(ServerContext *context, const DeleteRequest *request,
@@ -66,7 +69,7 @@ class KeyValueStoreImp1 final : public KeyValueStore::Service {
 
 void RunServer() {
   std::string server_address{
-      "0.0.0.0:50000"}; // this port is used as key value store
+      "0.0.0.0:50000"};  // this port is used as key value store
   KeyValueStoreImp1 service;
   ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
