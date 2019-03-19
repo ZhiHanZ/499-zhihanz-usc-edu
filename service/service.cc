@@ -1,6 +1,8 @@
 #include "service.h"
 using helper::signal_handler;
 using helper::StringToChirp;
+using Id::GetMicroSec;
+using std::literals::chrono_literals::operator""ms;
 
 // Receive a register request and tell the user whether theu are regited
 // successfully through status

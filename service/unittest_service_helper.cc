@@ -1,11 +1,20 @@
 #include "service_helper.h"
 #include <chrono>
-#include <gtest/gtest.h>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
-using namespace parser;
+#include <gtest/gtest.h>
+#include "unique_id.h"
+using helper::chirpInit;
+using helper::StringToChirp;
+using Id::IdGenerator;
+using parser::Deparser;
+using parser::Parser;
+using std::cout;
+using std::endl;
+using std::string;
+using std::vector;
 
 // test whether parser and deparser can be used to the empty string and empty
 // vector
@@ -27,8 +36,6 @@ TEST(test, add) {
   auto vec1 = Deparser(str1);
   ASSERT_EQ(vec, vec1);
 }
-using namespace helper;
-using namespace std;
 IdGenerator idG;
 // parse username, text, pair , pid into a chirp string and convert it back to
 // see whether it can be converted successfully

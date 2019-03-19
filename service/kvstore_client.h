@@ -1,16 +1,16 @@
-#ifndef KVSTORE_CLIENT_H_
-#define KVSTORE_CLIENT_H_
+#ifndef SERVICE_KVSTORE_CLIENT_H_
+#define SERVICE_KVSTORE_CLIENT_H_
 
-#include "../kvstore/cchash.h"
-#include "../service/service_helper.h"
-#include "kvstore.grpc.pb.h"
-#include "kvstore.pb.h"
-#include "service.pb.h"
 #include <grpcpp/grpcpp.h>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+#include "../kvstore/cchash.h"
+#include "../service/service_helper.h"
+#include "kvstore.grpc.pb.h"
+#include "kvstore.pb.h"
+#include "service.pb.h"
 
 using chirp::Chirp;
 using chirp::DeleteReply;
@@ -32,9 +32,9 @@ using grpc::StatusCode;
 // given key and delete key value pair through given in key value store
 // operations
 class KeyValueStoreClient {
-public:
-  KeyValueStoreClient(std::shared_ptr<Channel> channel)
-      : stub_(KeyValueStore::NewStub(channel)) {}
+ public:
+  explicit KeyValueStoreClient(std::shared_ptr<Channel> channel)
+                              : stub_(KeyValueStore::NewStub(channel)) {}
 
   // Requests each key in the vector and displays the key and its corresponding
   // value as a pair
@@ -121,7 +121,7 @@ public:
     return status;
   }
 
-private:
+ private:
   std::unique_ptr<KeyValueStore::Stub> stub_;
 };
-#endif
+#endif  // SERVICE_KVSTORE_CLIENT_H_

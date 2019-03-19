@@ -43,6 +43,7 @@ using grpc::ServerContext;
 using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
+using Id::IdGenerator;
 using grpc::StatusCode;
 
 static const char USER_ID[]{"user_id: "};
