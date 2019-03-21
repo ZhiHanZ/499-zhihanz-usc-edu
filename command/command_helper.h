@@ -52,6 +52,7 @@ DEFINE_string(follow, "", "please enter a username you want to follow");
 DEFINE_string(read, "", "read the chirp thread at a given id");
 DEFINE_bool(monitor, false, "please enter the user name you want to monitor");
 DEFINE_bool(lt, true, "little relation");
+
 namespace helper {
 // Make chirp request
 static auto ChirpRequestMaker(const string& registeruser, const string& chirp,
@@ -62,6 +63,7 @@ static auto ChirpRequestMaker(const string& registeruser, const string& chirp,
   request->set_parent_id(reply);
   return request;
 }
+
 // Make follow request
 static auto FollowRequestMaker(const string& user, const string& tofollow) {
   FollowRequest* request = new FollowRequest;
@@ -69,12 +71,14 @@ static auto FollowRequestMaker(const string& user, const string& tofollow) {
   request->set_to_follow(tofollow);
   return request;
 }
+
 // Make read request
 static auto ReadRequestMaker(const string& id) {
   auto request = new ReadRequest;
   request->set_chirp_id(id);
   return request;
 }
+
 // make monitor request
 static auto MonitorRequestMaker(const string& user) {
   auto request = new MonitorRequest;
@@ -82,6 +86,7 @@ static auto MonitorRequestMaker(const string& user) {
   return request;
 }
 }  // namespace helper
+
 namespace formatChirp {
 // print formated chirp
 static void printChirp(const Chirp& chirp) {
