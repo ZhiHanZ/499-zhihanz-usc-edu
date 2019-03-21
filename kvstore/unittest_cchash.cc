@@ -1,7 +1,7 @@
-#include "cchash.h"
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
+#include "cchash.h"
 
 ConcurrentHashTable<std::string, std::string> hs;
 // test whether test can be inited successfully

@@ -1,27 +1,28 @@
-#ifndef CC_HASH_H_
-#define CC_HASH_H_
+#ifndef KVSTORE_CCHASH_H_
+#define KVSTORE_CCHASH_H_
 #include <algorithm>
 #include <functional>
 #include <list>
 #include <memory>
 #include <shared_mutex>
+#include <utility>
 #include <vector>
 
 template <typename Key, typename Value, typename Hash = std::hash<Key>>
 class ConcurrentHashTable {
-public:
+ public:
   // Consstruct a hash table with its default size is 19.
-  explicit ConcurrentHashTable(unsigned num_buckets = default_buckets_)
+  explicit ConcurrentHashTable(unsigned num_buckets = kDefaultBuckets_)
       : table_(num_buckets) {
     for (unsigned i = 0; i < num_buckets; ++i) {
       table_[i].reset(new BucketType);
     }
   }
   // Get value corresponding to the key;
-  Value GetValue(const Key &key) { return GetBucket(key).GetValue(key); }
+  Value GetValue(const Key &key) const { return GetBucket(key).GetValue(key); }
   // Get value corresponding to the key, if there is no value, return default
   // value(second param).
-  Value GetValue(const Key &key, const Value &val) {
+  Value GetValue(const Key &key, const Value &val) const {
     return GetBucket(key).GetValue(key, val);
   }
   // Add key value pair. if keys exists return false
@@ -29,7 +30,7 @@ public:
     return GetBucket(key).AddValue(key, val);
   }
   // check whether table has key
-  bool Has(const Key &key) { return GetBucket(key).HasKey(key); }
+  bool Has(const Key &key) const { return GetBucket(key).HasKey(key); }
   // Add or Update key value pair
   void AddOrUpdate(const Key &key, const Value &val) {
     GetBucket(key).AddOrUpdateValue(key, val);
@@ -37,12 +38,18 @@ public:
   // delete key.
   void DeleteKey(const Key &key) { GetBucket(key).DeleteKey(key); }
 
-private:
+ private:
   // do not allow copy operation
   ConcurrentHashTable(const ConcurrentHashTable &other) = delete;
   auto &operator=(const ConcurrentHashTable &other) = delete;
+  // each bucket contain different hash value, Here provided basic API for it.
+  // whether bucket has given hash key value
+  // Get the value through key
+  // Get the value through key(if key do not exists, return a default value)
+  // Add Value through key-value pair
+  // Update Value through key-value pair
   class BucketType {
-  public:
+   public:
     // return whether buckey contains given key
     bool HasKey(const Key &key) {
       std::shared_lock<std::shared_mutex> lock(mutex);
@@ -91,12 +98,12 @@ private:
       }
     }
 
-  private:
+   private:
     typedef std::pair<Key, Value> bucket_value;
     typedef std::list<bucket_value> bucket_data;
     bucket_data data_;
     typedef typename bucket_data::iterator bucket_iter;
-    mutable std::shared_mutex mutex; // c++ 17 feature
+    mutable std::shared_mutex mutex;  // c++ 17 feature
     bucket_iter FindEntry(const Key &key) {
       return std::find_if(
           data_.begin(), data_.end(),
@@ -105,11 +112,11 @@ private:
   };
   std::vector<std::unique_ptr<BucketType>> table_;
   Hash hash_;
-  const static unsigned default_buckets_ = 19;
+  static const unsigned kDefaultBuckets_ = 19;
   // Get the bucket through hash value;
   BucketType &GetBucket(const Key &key) const {
     std::size_t const index_ = hash_(key) % table_.size();
     return *table_[index_];
   }
 };
-#endif // CC_HASH_H_
+#endif  // KVSTORE_CCHASH_H_

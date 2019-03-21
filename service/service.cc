@@ -1,4 +1,8 @@
 #include "service.h"
+using helper::signal_handler;
+using helper::StringToChirp;
+using Id::GetMicroSec;
+using std::literals::chrono_literals::operator""ms;
 
 // Receive a register request and tell the user whether theu are regited
 // successfully through status
@@ -12,11 +16,9 @@ Status ServiceImpl::registeruser(ServerContext *context,
     return Status(StatusCode::ALREADY_EXISTS,
                   "This username have already used.");
   Status status1 = client.Put(USER_ID + user, "");
-  if (!status1.ok())
-    return status1;
+  if (!status1.ok()) return status1;
   Status status2 = client.Put(USER_FOLLOWED + user, "");
-  if (!status2.ok())
-    return status2;
+  if (!status2.ok()) return status2;
   return Status::OK;
 }
 // Get the most recent published chirp id through name
@@ -37,8 +39,7 @@ auto ServiceImpl::GetIdReply(const string &id) {
   KeyValueStoreClient client(grpc::CreateChannel(
       "localhost:50000", grpc::InsecureChannelCredentials()));
   auto replystr = client.GetValue(ID_REPLY + id);
-  if (replystr == "")
-    return vector<string>{};
+  if (replystr == "") return vector<string>{};
   return parser::Deparser(replystr);
 }
 // Get the chirp string through id
@@ -50,7 +51,7 @@ auto ServiceImpl::GetIdChirp(const string &id) {
 // Make Chirp string
 string ServiceImpl::ChirpStringMaker(const string &username, const string &text,
                                      const string &parent_id) {
-  auto pair = idG_();
+  auto pair = idG();
   auto chirpstring =
       helper::chirpInit(username, text, pair.second, parent_id, pair.first);
   return chirpstring;
@@ -160,7 +161,7 @@ Status ServiceImpl::monitor(ServerContext *context,
                             const MonitorRequest *request,
                             ServerWriter<MonitorReply> *reply) {
   signal(SIGINT, signal_handler);
-  auto time_interval = 5ms; // pick one refresh frequency
+  auto time_interval = 5ms;  // pick one refresh frequency
   auto curr = GetMicroSec();
   auto followed = GetUserFollowed(request->username());
   if (followed.size() == 0) {
