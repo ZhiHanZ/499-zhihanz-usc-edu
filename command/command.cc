@@ -4,6 +4,8 @@ using helper::ChirpRequestMaker;
 using helper::FollowRequestMaker;
 using helper::MonitorRequestMaker;
 using helper::ReadRequestMaker;
+
+static const char DEFAULT_REPLY[]{"-1"};
 // Regist a user given a username
 Status CommandClient::RegisterUser(const string &registeruser) {
   if (registeruser == "")
@@ -26,7 +28,7 @@ Chirp CommandClient::ChirpPost(const string &username, const string &chirp,
   ClientContext context;
   auto request = ChirpRequestMaker(username, chirp, reply);
   auto chirply = new ChirpReply;
-  if (reply != "-1") {
+  if (reply != DEFAULT_REPLY) {
     auto request = ReadRequestMaker(reply);
     ClientContext context;
     ReadReply *reply = new ReadReply;
