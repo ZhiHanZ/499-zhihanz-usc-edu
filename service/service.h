@@ -96,6 +96,6 @@ public:
                  ServerWriter<MonitorReply> *reply) override;
 
 private:
-  IdGenerator idG;
+  IdGenerator idG_;
 };
 #endif

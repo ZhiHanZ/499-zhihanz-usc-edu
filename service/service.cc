@@ -50,7 +50,7 @@ auto ServiceImpl::GetIdChirp(const string &id) {
 // Make Chirp string
 string ServiceImpl::ChirpStringMaker(const string &username, const string &text,
                                      const string &parent_id) {
-  auto pair = idG();
+  auto pair = idG_();
   auto chirpstring =
       helper::chirpInit(username, text, pair.second, parent_id, pair.first);
   return chirpstring;
@@ -137,6 +137,7 @@ Status ServiceImpl::read(ServerContext *context, const ReadRequest *request,
   uint64_t index = 0;
   // breadth first search all chirps.
   queue.push(*root);
+  delete root;
   while (!queue.empty()) {
     Chirp curr = queue.front();
     auto chirpq = reply->add_chirps();
@@ -147,6 +148,7 @@ Status ServiceImpl::read(ServerContext *context, const ReadRequest *request,
         string chirpstr = GetIdChirp(reply);
         Chirp *chirp = helper::StringToChirp(chirpstr);
         queue.push(*chirp);
+        delete chirp;
       }
     }
     queue.pop();
