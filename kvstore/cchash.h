@@ -12,7 +12,7 @@ template <typename Key, typename Value, typename Hash = std::hash<Key>>
 class ConcurrentHashTable {
  public:
   // Consstruct a hash table with its default size is 19.
-  explicit ConcurrentHashTable(unsigned num_buckets = default_buckets_)
+  explicit ConcurrentHashTable(unsigned num_buckets = kDefaultBuckets_)
       : table_(num_buckets) {
     for (unsigned i = 0; i < num_buckets; ++i) {
       table_[i].reset(new BucketType);
@@ -42,6 +42,12 @@ class ConcurrentHashTable {
   // do not allow copy operation
   ConcurrentHashTable(const ConcurrentHashTable &other) = delete;
   auto &operator=(const ConcurrentHashTable &other) = delete;
+  // each bucket contain different hash value, Here provided basic API for it.
+  // whether bucket has given hash key value
+  // Get the value through key
+  // Get the value through key(if key do not exists, return a default value)
+  // Add Value through key-value pair
+  // Update Value through key-value pair
   class BucketType {
    public:
     // return whether buckey contains given key
@@ -106,7 +112,7 @@ class ConcurrentHashTable {
   };
   std::vector<std::unique_ptr<BucketType>> table_;
   Hash hash_;
-  static const unsigned default_buckets_ = 19;
+  static const unsigned kDefaultBuckets_ = 19;
   // Get the bucket through hash value;
   BucketType &GetBucket(const Key &key) const {
     std::size_t const index_ = hash_(key) % table_.size();
