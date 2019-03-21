@@ -93,6 +93,6 @@ class ServiceImpl final : public ServiceLayer::Service {
                  ServerWriter<MonitorReply> *reply) override;
 
  private:
-  IdGenerator idG;
+  IdGenerator idG_;
 };
 #endif  //  SERVICE_SERVICE_H_

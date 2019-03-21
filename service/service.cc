@@ -51,7 +51,7 @@ auto ServiceImpl::GetIdChirp(const string &id) {
 // Make Chirp string
 string ServiceImpl::ChirpStringMaker(const string &username, const string &text,
                                      const string &parent_id) {
-  auto pair = idG();
+  auto pair = idG_();
   auto chirpstring =
       helper::chirpInit(username, text, pair.second, parent_id, pair.first);
   return chirpstring;
