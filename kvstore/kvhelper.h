@@ -27,9 +27,8 @@ int64_t Delete(ConcurrentHashTable<string, string> &table,
   if (table.Has(key)) {
     table.DeleteKey(key);
     return 0;
-  } else {
-    return -1;
   }
+  return -1;
 }
 }  //  namespace helper
 #endif  // KVSTORE_KVHELPER_H_
