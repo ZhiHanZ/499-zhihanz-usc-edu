@@ -6,47 +6,12 @@
 #include "../kvstore/cchash.h"
 #include "kvstore.pb.h"
 #include "kvstore_client.h"
+#include "service_helper.h"
+#include "service_string.h"
 
 using chirp::GetReply;
 using std::string;
 
-namespace UnitTest {
-// The kvstore client which is used for unittest
-// Support Put, PutOrUpdate, GetValue through key, Delete key value pair through
-// key operations
-class UnitTestKVClient {
- public:
-  UnitTestKVClient() : table_{} {}
-  // Put or update the key value pair in key value store
-  bool PutOrUpdate(std::string key, std::string value) {
-    table_.AddOrUpdate(key, value);
-    return true;
-  }
-  // Put the key value pair into key value store
-  // If store has given key return false
-  bool Put(std::string key, std::string value) {
-    if (table_.Has(key)) return false;
-    table_.Add(key, value);
-    return true;
-  }
-  // Get the value of corresponding key
-  string GetValue(const std::string& key) {
-    string response = table_.GetValue(key);
-    return response;
-  }
-  // return whether key value store has such key
-  bool Has(std::string key) { return table_.Has(key); }
-  // delete corresponding key value pair through key
-  bool Delete(std::string key) {
-    table_.DeleteKey(key);
-    return true;
-  }
-
-  ConcurrentHashTable<string, string> table_;
-};
-}  // namespace UnitTest
-
-ConcurrentHashTable<string, string> table{};
 UnitTest::UnitTestKVClient client{};
 // test that whether Put can put some key value pair into key value store.
 TEST(test, Put) {
@@ -63,8 +28,18 @@ TEST(test, Update) {
   auto b2 = client.PutOrUpdate("test1", "val3");
   EXPECT_EQ(true, b1);
   EXPECT_EQ(true, b2);
+}
+// Get the value of some key
+TEST(test, Get) {
   auto val = client.GetValue("test1");
   EXPECT_EQ("val3", val);
+}
+// Test Has method in here, indicate whether client has such key-value pair
+TEST(test, Has) {
+  auto b1 = client.Has("test1");
+  auto b2 = client.Has("unknown");
+  ASSERT_EQ(true, b1);
+  ASSERT_EQ(false, b2);
 }
 // Test on whether key value pair can be deleted in key value store
 TEST(test, Delete) {
