@@ -7,30 +7,22 @@ LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
 PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
-PROTOS_PATH = ../protoc
+PROTOS_PATH = utils/pb/
 vpath %.proto $(PROTOS_PATH)
-all: kvstore.pb.cc service.grpc.pb.cc kvstore.grpc.pb.cc service.pb.cc unittest_service_helper service
-service: service.o service.pb.o service.grpc.pb.o kvstore.pb.o kvstore.grpc.pb.o
+all: service unittest_service
+service: service.o utils/unique_id.o utils/kvstore_client.o utils/service_helper.o utils/pb/service.pb.o utils/pb/service.grpc.pb.o utils/pb/kvstore.pb.o utils/pb/kvstore.grpc.pb.o
 	$(CXX) $^ $(LDFLAGS) -g -o $@
-unittest_unique_id: unittest_unique_id.cc
+unittest_service: service_string.o utils/kvstore_string.o utils/service_helper.o utils/pb/service.pb.o utils/service_helper.o utils/unique_id.o unittest_service.o
 	$(CXX) $^ $(LDFLAGS) -g -o $@
-unittest_service_helper: unittest_service_helper.o service.pb.o service.grpc.pb.o kvstore.pb.o kvstore.grpc.pb.o
-	$(CXX) $^ $(LDFLAGS) -g -o $@
-unittest_service: unittest_service.o service.pb.o service.grpc.pb.o kvstore.pb.o kvstore.grpc.pb.o
-	$(CXX) $^ $(LDFLAGS) -g -o $@
-unittest_service.o: unittest_service.cc
-	$(CXX) -c -g -std=c++17 unittest_service.cc
-client: kvstore.pb.o kvstore.grpc.pb.o client.o
-	$(CXX) $^ $(LDFLAGS) -o $@
 .PRECIOUS: %.grpc.pb.cc
-service.grpc.pb.cc: ../protoc/service.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
-kvstore.grpc.pb.cc: ../protoc/kvstore.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+service.grpc.pb.cc: utils/pb/service.proto
+	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=utils/pb/. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+kvstore.grpc.pb.cc: utils/pb/kvstore.proto
+	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=utils/pb/. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 .PRECIOUS: %.pb.cc
-kvstore.pb.cc: ../protoc/kvstore.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=. $<
-service.pb.cc: ../protoc/service.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=. $<
+kvstore.pb.cc: utils/pb/kvstore.proto
+	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=utils/pb/. $<
+service.pb.cc: utils/pb/service.proto
+	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=utils/pb/. $<
 clean:
-	rm *.o
+	rm *.o unittest_service service
