@@ -22,26 +22,34 @@ compile:
 In the root
 ```
 cd kvstore
-make
+make // may need to make several times
+```
+In kvstore
+make their unittests(kvstore tested in unittestkvhelper
+```
+cd utils
+make // may need to make several times
 ```
 ## service
 compile:
 In the root
 ```
 cd service
-make serive ## build service rpc service without unittest
+make serive ## (may need to make several times) build service rpc service without unittest
 ```
 If you want to make them all 
 ```
 cd service
-make
+make (may need to make several times)
+cd utils
+make 
 ```
 ## command
 compile:
 In the root
 ```
 cd command
-make
+make (may need to make several times
 ```
 # How to use?
 ## Registration:
