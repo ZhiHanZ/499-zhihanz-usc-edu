@@ -7,7 +7,7 @@
 #include <shared_mutex>
 #include <utility>
 #include <vector>
-
+namespace utils {
 template <typename Key, typename Value, typename Hash = std::hash<Key>>
 class ConcurrentHashTable {
  public:
@@ -99,10 +99,12 @@ class ConcurrentHashTable {
     }
 
    private:
+    //key value pair in here
     typedef std::pair<Key, Value> bucket_value;
     typedef std::list<bucket_value> bucket_data;
     bucket_data data_;
     typedef typename bucket_data::iterator bucket_iter;
+    // shared mutex is used to realize RW lock
     mutable std::shared_mutex mutex;  // c++ 17 feature
     bucket_iter FindEntry(const Key &key) {
       return std::find_if(
@@ -119,4 +121,5 @@ class ConcurrentHashTable {
     return *table_[index_];
   }
 };
+}
 #endif  // KVSTORE_UTILS_CCHASH_H_

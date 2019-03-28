@@ -27,6 +27,7 @@ using key_val::helper::Delete;
 using key_val::helper::Get;
 using key_val::helper::Put;
 namespace key_val {
+//NOTE this is tested through kvhelper
 // put given element in key value store do not allow to put existed key
 Status KeyValueStoreImp1::put(ServerContext *context, const PutRequest *request,
                               PutReply *reply) {

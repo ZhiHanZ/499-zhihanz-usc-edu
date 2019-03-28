@@ -1,5 +1,5 @@
-#ifndef SERVICE_UNIQUE_ID_H_
-#define SERVICE_UNIQUE_ID_H_
+#ifndef SERVICE_UTILS_UNIQUE_ID_H_
+#define SERVICE_UTILS_UNIQUE_ID_H_
 #include <atomic>
 #include <chrono>
 #include <mutex>
@@ -52,4 +52,4 @@ class IdGenerator {
 };
 }  // namespace chirp_id
 }  // namespace services
-#endif  // SERVICE_UNIQUE_ID_H_
+#endif  // SERVICE_UTILS_UNIQUE_ID_H_

@@ -115,13 +115,10 @@ class FakeService final {
                    const UnitTestKVClient &client);
   // Create another thread put updated monitor reply to vector<Chirp> buffer
   // using mutex monitor_mutex_ and condition_variable monitor_buf_signal_ to
-  // synchronize examle usage: If you want to buffer the information from monitor
-  // FakeService service;
-  // UnitTestKVClient client;
-  // MonitorRequest request;
-  // MonitorReply reply;
-  // std::vector<Chirp> buffer;
-  // std::thread buffer_thr = service.MonitorBuffer(&reply, buffer);
+  // synchronize examle usage: If you want to buffer the information from
+  // monitor FakeService service; UnitTestKVClient client; MonitorRequest
+  // request; MonitorReply reply; std::vector<Chirp> buffer; std::thread
+  // buffer_thr = service.MonitorBuffer(&reply, buffer);
   // service.monitor(&request, &reply, client, 100); //timed after about 500 ms
   // buffer_thr.join()
   std::thread MonitorBuffer(const MonitorReply *reply, vector<Chirp> &buffer);
@@ -129,6 +126,10 @@ class FakeService final {
   void ChirpSet(ChirpReply *reply, const Chirp &chirp);
   // allocate chirp messages to reply (in stack(do not need to manage memory;
   void MonitorSet(MonitorReply *reply, const Chirp &chirp);
+  // ONLY when we need to use monitor buffer to buffer message
+  // from monitor, should we set this mode to be true
+  void OpenBuffer() { buff_mode_ = true; }
+  void CloseBuffer() { buff_mode_ = false; }
 
  private:
   IdGenerator
@@ -143,6 +144,9 @@ class FakeService final {
   // used to synchronize between monitor() and MonitorBuffer function
   // when we need to buffer messages received from monitor
   condition_variable monitor_buf_signal_;
+  // It will be set as True, if the information received from buffer should be
+  // send to a buffer
+  bool buff_mode_ = false;
   // It will be set as True, if monitor received a message
   bool monitor_flag_ = false;
   // It will be set as True, if monitor exit

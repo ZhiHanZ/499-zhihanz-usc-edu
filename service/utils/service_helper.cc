@@ -14,13 +14,14 @@ std::string ChirpInit(const std::string &username, const std::string &text,
                       const std::string &id, const std::string &pid,
                       Timestamp time) {
   std::string chirpstring;
-  auto chirp = new Chirp;  // using unique_ptr in here produce bugs!
-  chirp->set_username(username);
-  chirp->set_text(text);
-  chirp->set_id(id);
-  chirp->set_parent_id(pid);
-  chirp->set_allocated_timestamp(&time);
-  chirp->SerializeToString(&chirpstring);
+  Chirp chirp{};  // using unique_ptr in here produce bugs!
+  chirp.set_username(username);
+  chirp.set_text(text);
+  chirp.set_id(id);
+  chirp.set_parent_id(pid);
+  chirp.mutable_timestamp()->set_seconds(time.seconds());
+  chirp.mutable_timestamp()->set_useconds(time.useconds());
+  chirp.SerializeToString(&chirpstring);
   return chirpstring;
 }
 // Convert string to chirp pointer

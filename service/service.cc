@@ -181,7 +181,10 @@ Status ServiceImpl::read(ServerContext *context, const ReadRequest *request,
 // std::condition_variable monitor_buf_signal_
 // bool monitor_flag_ and end_flag_ are used to synchronize monitor
 // and its buffer function MonitorBuffer.
-// it is monitor's responsibility for curr_chirp object
+// if you want to buffer it, remeber to set buff_mode_ to be true
+// by using OpenBuffer() function
+// and when you do not want to buffer them
+// using CloseBuffer() to close
 Status ServiceImpl::monitor(ServerContext *context,
                             const MonitorRequest *request,
                             ServerWriter<MonitorReply> *reply) {
@@ -202,6 +205,8 @@ Status ServiceImpl::monitor(ServerContext *context,
       auto chirp_time = curr_chirp.timestamp();
       if (chirp_time.useconds() > curr) {
         std::unique_lock<mutex> monitor_lk(monitor_mutex_);
+        // once buff mode is open, wait for MonitorBuffer function
+        // to finish and start to receive another reply
         if (buff_mode_) {
           monitor_buf_signal_.wait(monitor_lk,
                                    [this] { return !monitor_flag_; });
@@ -237,17 +242,21 @@ std::thread ServiceImpl::MonitorBuffer(const MonitorReply *reply,
   std::thread thr([this, reply, lock_cond, &buffer] {
     while (true) {
       std::unique_lock<mutex> monitor_lk(monitor_mutex_);
+      // once Monitor received a message or Monitor exit
+      // it will be awaken
       monitor_buf_signal_.wait(monitor_lk, lock_cond);
       if (exit_flag_) return;
       Chirp curr = reply->chirp();
       buffer.push_back(curr);
       monitor_flag_ = false;
       monitor_lk.unlock();
+      // tell monitor to collect the next information
       monitor_buf_signal_.notify_all();
     }
   });
   return thr;
 }
+// copy value from reply_cirp to ChirpReply* reply
 void ServiceImpl::ChirpSet(ChirpReply *reply, const Chirp &reply_chirp) {
   reply->mutable_chirp()->set_id(reply_chirp.id());
   reply->mutable_chirp()->set_username(reply_chirp.username());
@@ -258,6 +267,7 @@ void ServiceImpl::ChirpSet(ChirpReply *reply, const Chirp &reply_chirp) {
   reply->mutable_chirp()->mutable_timestamp()->set_useconds(
       reply_chirp.timestamp().useconds());
 }
+// copy value from reply_cirp to MonitorReply* reply
 void ServiceImpl::MonitorSet(MonitorReply *reply, const Chirp &reply_chirp) {
   reply->mutable_chirp()->set_id(reply_chirp.id());
   reply->mutable_chirp()->set_username(reply_chirp.username());

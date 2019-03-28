@@ -16,6 +16,7 @@ using grpc::Server;
 using grpc::ServerContext;
 using grpc::ServerReaderWriter;
 using grpc::Status;
+using utils::ConcurrentHashTable;
 namespace key_val {
 class KeyValueStoreImp1 final : public KeyValueStore::Service {
   // put given element in key value store do not allow to put existed key

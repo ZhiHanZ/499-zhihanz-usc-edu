@@ -218,11 +218,13 @@ TEST(test, monitor) {
   //  if time passed 510 ms in here
   auto th2 = service.MonitorBuffer(&monitor_reply, buffer);
   service.SetNumMonitorLoop(110);
+  service.OpenBuffer();
   service.monitor(&monitor_request, &monitor_reply, client);
   // Set the value in promise
   // Wait for thread to join
   th1.join();
   th2.join();
+  service.CloseBuffer();
   EXPECT_EQ(3, buffer.size());
   // it will put monitor into default value;
   EXPECT_EQ(-1, service.GetNumMonitorLoop());

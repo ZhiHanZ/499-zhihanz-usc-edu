@@ -1,5 +1,5 @@
-#ifndef KVSTORE_CCHASH_H_
-#define KVSTORE_CCHASH_H_
+#ifndef SERVICE_UTILS_CCHASH_H_
+#define SERVICE_UTILS_CCHASH_H_
 #include <algorithm>
 #include <functional>
 #include <list>
@@ -7,7 +7,7 @@
 #include <shared_mutex>
 #include <utility>
 #include <vector>
-
+namespace utils {
 template <typename Key, typename Value, typename Hash = std::hash<Key>>
 class ConcurrentHashTable {
  public:
@@ -119,4 +119,5 @@ class ConcurrentHashTable {
     return *table_[index_];
   }
 };
-#endif  // KVSTORE_CCHASH_H_
+}
+#endif  // SERVICE_UTILS_CCHASH_H_

@@ -11,7 +11,7 @@
 // let one user follow another user
 // read the chirp thread from given chirp id
 // monitor the chirp on those people given user followed
-
+namespace commandline {
 class CommandClient {
  public:
   explicit CommandClient(std::shared_ptr<Channel> channel)
@@ -35,4 +35,6 @@ class CommandClient {
  private:
   std::unique_ptr<ServiceLayer::Stub> stub_;
 };
+
+}  // namespace commandline
 #endif  // COMMAND_COMMAND_H_

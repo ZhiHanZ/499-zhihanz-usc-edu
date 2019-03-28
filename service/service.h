@@ -125,20 +125,22 @@ class ServiceImpl final : public ServiceLayer::Service {
 
   // Create another thread put updated monitor reply to vector<Chirp> buffer
   // using mutex monitor_mutex_ and condition_variable monitor_buf_signal_ to
-  // synchronize examle usage: If you want to buffer the information from monitor
-  // ServiceImpl service;
-  // UnitTestKVClient client;
+  // synchronize example usage: If you want to buffer the information from
+  // monitor ServiceImpl service; service.OpenBuffer(); UnitTestKVClient client;
   // MonitorRequest request;
   // MonitorReply reply;
   // std::vector<Chirp> buffer;
   // std::thread buffer_thr = service.MonitorBuffer(&reply, buffer);
   // service.monitor(&request, &reply, client, 100); //timed after about 500 ms
   // buffer_thr.join()
+  // service.CloseBuffer();
   std::thread MonitorBuffer(const MonitorReply *reply, vector<Chirp> &buffer);
   // allocate chirp messages to reply (in stack(do not need to manage memory;
   void ChirpSet(ChirpReply *reply, const Chirp &chirp);
   // allocate chirp messages to reply (in stack(do not need to manage memory;
   void MonitorSet(MonitorReply *reply, const Chirp &chirp);
+  void OpenBuffer() { buff_mode_ = true; }
+  void CloseBuffer() { buff_mode_ = false; }
 
  private:
   // dependency injection used to create unique id

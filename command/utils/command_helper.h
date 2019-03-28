@@ -1,6 +1,5 @@
 #ifndef COMMAND_UTILS_COMMAND_HELPER_H_
 #define COMMAND_UTILS_COMMAND_HELPER_H_
-#include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
 #include <time.h>
@@ -42,15 +41,21 @@ using std::cout;
 using std::endl;
 using std::string;
 
-DEFINE_string(regist, "", "What username you want to use?");
-DEFINE_string(user, "", "please enter ur username");
-DEFINE_string(chirp, "", "a new chirp with the given text");
-DEFINE_string(reply, "", "please denote a chirp id you want to reply");
-DEFINE_string(follow, "", "please enter a username you want to follow");
-DEFINE_string(read, "", "read the chirp thread at a given id");
-DEFINE_bool(monitor, false, "please enter the user name you want to monitor");
-DEFINE_bool(lt, true, "little relation");
-
+namespace command_helper {
+static const uint32_t kREGIST = 1;
+static const uint32_t kCHIRP = 2;
+static const uint32_t kREPLY = 3;
+static const uint32_t kFOLLOW = 4;
+static const uint32_t kMONITOR = 5;
+static const uint32_t kREAD = 6;
+static const uint32_t kNULL = 7;
+static const uint32_t kOTHERS = 8;
+// switch to different case when encounter different inputs`
+uint32_t CommandHandler(const string& regist, const string& user,
+                        const string& chirp, const string& reply,
+                        const string& read, const string& follow,
+                        const bool& monitor);
+}  // namespace command_helper
 namespace helper {
 // Make chirp request
 static auto ChirpRequestMaker(const string& registeruser, const string& chirp,
@@ -79,28 +84,21 @@ static auto ReadRequestMaker(const string& id) {
 
 // make monitor request
 static auto MonitorRequestMaker(const string& user) {
-  auto request = new MonitorRequest;
-  request->set_username(user);
+  MonitorRequest request;
+  request.set_username(user);
   return request;
 }
-}  // namespace helper
+}  //  namespace helper
 
-namespace formatChirp {
+namespace format {
 // print formated chirp
-static void printChirp(const Chirp& chirp) {
-  LOG(INFO) << "username: " << chirp.username();
-  LOG(INFO) << "text: " << chirp.text();
-  LOG(INFO) << "parent id:  " << chirp.parent_id();
-  LOG(INFO) << "Chirp id: " << chirp.id();
-  Timestamp time = chirp.timestamp();
-  //  thread safety
-  time_t sec = time.seconds();
-  struct tm newtime;
-  localtime_r(&sec, &newtime);
-  char buffer[50];
-  asctime_r(&newtime, buffer);
-  LOG(INFO) << "posted time: " << buffer;
-}
-}  // namespace formatChirp
+void PrintChirp(const Chirp& chirp);
+// print help information
+void HelpInfo();
+// print regist information
+void RegistHandler(const Status& status, const string& regist);
+// print follow information
+void FollowHandler(const Status& status, const string& follow);
+}  // namespace format
 
 #endif  //  COMMAND_UTILS_COMMAND_HELPER_H_

@@ -3,6 +3,7 @@
 #include <string>
 #include "cchash.h"
 using std::string;
+using utils::ConcurrentHashTable;
 namespace unittest {
 // The kvstore client which is used for unittest
 // Support Put, PutOrUpdate, GetValue through key, Delete key value pair through
