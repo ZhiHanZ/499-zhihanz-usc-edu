@@ -1,3 +1,4 @@
+#include "kvstore.h"
 #include <grpcpp/grpcpp.h>
 #include <algorithm>
 #include <iostream>
@@ -8,7 +9,6 @@
 #include "utils/kvhelper.h"
 #include "utils/pb/kvstore.grpc.pb.h"
 #include "utils/pb/kvstore.pb.h"
-#include "kvstore.h"
 
 using chirp::DeleteReply;
 using chirp::DeleteRequest;
@@ -27,41 +27,42 @@ using key_val::helper::Delete;
 using key_val::helper::Get;
 using key_val::helper::Put;
 namespace key_val {
-  // put given element in key value store do not allow to put existed key
-  Status KeyValueStoreImp1::put(ServerContext *context, const PutRequest *request,
-             PutReply *reply) {
-    if (Put(database_, request->key(), request->value()) == 0) {
-      return Status::OK;
-    } else {
-      return Status(StatusCode::ALREADY_EXISTS, "key exists.");
-    }
-  }
-  // get value through key, if key do not exists return error
-  Status KeyValueStoreImp1::get(ServerContext *context,
-             ServerReaderWriter<GetReply, GetRequest> *stream) {
-    GetRequest request;
-    while (stream->Read(&request)) {
-      GetReply response;
-      auto replyval = Get(database_, request.key());
-      if (database_.Has(request.key())) {
-        response.set_value(replyval);
-        stream->Write(response);
-        return Status::OK;
-      } else {
-        return Status(StatusCode::ALREADY_EXISTS, "key does not exist.");
-      }
-    }
+// put given element in key value store do not allow to put existed key
+Status KeyValueStoreImp1::put(ServerContext *context, const PutRequest *request,
+                              PutReply *reply) {
+  if (Put(database_, request->key(), request->value()) == 0) {
     return Status::OK;
+  } else {
+    return Status(StatusCode::ALREADY_EXISTS, "key exists.");
   }
-  // delete a key . if key do not exists, return a error
-  Status KeyValueStoreImp1::deletekey(ServerContext *context, const DeleteRequest *request,
-                   DeleteReply *reply) {
-    if (Delete(database_, request->key()) == 0) {
+}
+// get value through key, if key do not exists return error
+Status KeyValueStoreImp1::get(
+    ServerContext *context, ServerReaderWriter<GetReply, GetRequest> *stream) {
+  GetRequest request;
+  while (stream->Read(&request)) {
+    GetReply response;
+    auto replyval = Get(database_, request.key());
+    if (database_.Has(request.key())) {
+      response.set_value(replyval);
+      stream->Write(response);
       return Status::OK;
     } else {
       return Status(StatusCode::ALREADY_EXISTS, "key does not exist.");
     }
   }
+  return Status::OK;
+}
+// delete a key . if key do not exists, return a error
+Status KeyValueStoreImp1::deletekey(ServerContext *context,
+                                    const DeleteRequest *request,
+                                    DeleteReply *reply) {
+  if (Delete(database_, request->key()) == 0) {
+    return Status::OK;
+  } else {
+    return Status(StatusCode::ALREADY_EXISTS, "key does not exist.");
+  }
+}
 }  // namespace key_val
 
 void RunServer() {
