@@ -1,0 +1,33 @@
+#include "service_helper.h"
+#include <csignal>
+#include <string>
+#include <google/protobuf/message.h>
+#include <grpcpp/grpcpp.h>
+#include "unique_id.h"
+using chirp::Chirp;
+using chirp::Timestamp;
+using std::vector;
+namespace services{
+namespace service_helper {
+// convert username, text, id, parent_id to chirp
+std::string ChirpInit(const std::string &username, const std::string &text,
+                      const std::string &id, const std::string &pid,
+                      Timestamp time) {
+  std::string chirpstring;
+  auto chirp = new Chirp;  // using unique_ptr in here produce bugs!
+  chirp->set_username(username);
+  chirp->set_text(text);
+  chirp->set_id(id);
+  chirp->set_parent_id(pid);
+  chirp->set_allocated_timestamp(&time);
+  chirp->SerializeToString(&chirpstring);
+  return chirpstring;
+}
+// Convert string to chirp pointer
+Chirp StringToChirp(const std::string &chirpstring) {
+  Chirp chirp;
+  chirp.ParseFromString(chirpstring);
+  return chirp;
+}
+} // namespace service_helper
+} // namespace service
