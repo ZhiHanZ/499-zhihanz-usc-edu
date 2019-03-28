@@ -4,6 +4,7 @@
 #include "cchash.h"
 
 using std::string;
+using utils::ConcurrentHashTable;
 
 // helper methods used in key value store
 namespace key_val {
