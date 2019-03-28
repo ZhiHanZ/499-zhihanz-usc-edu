@@ -10,16 +10,16 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "utils/pb/kvstore.pb.h"
 #include "utils/kvstore_string.h"
+#include "utils/parser.h"
+#include "utils/pb/kvstore.pb.h"
 #include "utils/pb/service.pb.h"
 #include "utils/service_helper.h"
 #include "utils/unique_id.h"
-#include "utils/parser.h"
 
-using services::service_helper::StringToChirp;
 using services::chirp_id::GetMicroSec;
 using services::chirp_id::IdGenerator;
+using services::service_helper::StringToChirp;
 using std::literals::chrono_literals::operator""ms;
 using chirp::Chirp;
 using chirp::ChirpReply;
@@ -47,13 +47,13 @@ using grpc::ServerContext;
 using grpc::ServerWriter;
 using grpc::Status;
 using grpc::StatusCode;
+using services::parser::Deparser;
+using services::parser::Parser;
 using std::condition_variable;
 using std::mutex;
 using std::chrono::milliseconds;
 using unittest::FakeCode;
 using unittest::UnitTestKVClient;
-using services::parser::Parser;
-using services::parser::Deparser;
 namespace unittest {
 // const string& request: resgister name,
 // string& client: client that will be used to regist
@@ -221,7 +221,7 @@ FakeCode FakeService::monitor(const MonitorRequest *request,
 // create a new threed to buffer const MonitorReply* reply Chirp data
 // vector<Chirp>& buffer is going to buffer Chirp data
 std::thread FakeService::MonitorBuffer(const MonitorReply *reply,
-                                vector<Chirp> &buffer) {
+                                       vector<Chirp> &buffer) {
   // it will wake up this thread
   auto lock_cond = [this] { return exit_flag_ || monitor_flag_; };
   std::thread thr([this, reply, lock_cond, &buffer] {
@@ -238,25 +238,25 @@ std::thread FakeService::MonitorBuffer(const MonitorReply *reply,
   });
   return thr;
 }
-void FakeService::ChirpSet(ChirpReply* reply, const Chirp& reply_chirp){
+void FakeService::ChirpSet(ChirpReply *reply, const Chirp &reply_chirp) {
   reply->mutable_chirp()->set_id(reply_chirp.id());
   reply->mutable_chirp()->set_username(reply_chirp.username());
   reply->mutable_chirp()->set_text(reply_chirp.text());
   reply->mutable_chirp()->set_parent_id(reply_chirp.parent_id());
-  reply->mutable_chirp()->mutable_timestamp()
-                        ->set_seconds(reply_chirp.timestamp().seconds());
-  reply->mutable_chirp()->mutable_timestamp()
-                        ->set_useconds(reply_chirp.timestamp().useconds());
+  reply->mutable_chirp()->mutable_timestamp()->set_seconds(
+      reply_chirp.timestamp().seconds());
+  reply->mutable_chirp()->mutable_timestamp()->set_useconds(
+      reply_chirp.timestamp().useconds());
 }
-void FakeService::MonitorSet(MonitorReply* reply, const Chirp& reply_chirp){
+void FakeService::MonitorSet(MonitorReply *reply, const Chirp &reply_chirp) {
   reply->mutable_chirp()->set_id(reply_chirp.id());
   reply->mutable_chirp()->set_username(reply_chirp.username());
   reply->mutable_chirp()->set_text(reply_chirp.text());
   reply->mutable_chirp()->set_parent_id(reply_chirp.parent_id());
-  reply->mutable_chirp()->mutable_timestamp()
-                        ->set_seconds(reply_chirp.timestamp().seconds());
-  reply->mutable_chirp()->mutable_timestamp()
-                        ->set_useconds(reply_chirp.timestamp().useconds());
+  reply->mutable_chirp()->mutable_timestamp()->set_seconds(
+      reply_chirp.timestamp().seconds());
+  reply->mutable_chirp()->mutable_timestamp()->set_useconds(
+      reply_chirp.timestamp().useconds());
 }
 
 }  // namespace unittest

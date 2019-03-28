@@ -1,21 +1,21 @@
 #include "service.h"
-#include "utils/service_helper.h"
-#include "utils/unique_id.h"
-#include "utils/parser.h"
-#include <vector>
+#include <queue>
 #include <string>
 #include <thread>
-#include <queue>
-using services::service_helper::StringToChirp;
-using services::service_helper::ChirpInit;
+#include <vector>
+#include "utils/parser.h"
+#include "utils/service_helper.h"
+#include "utils/unique_id.h"
 using services::chirp_id::GetMicroSec;
+using services::service_helper::ChirpInit;
+using services::service_helper::StringToChirp;
 using std::literals::chrono_literals::operator""ms;
-using services::parser::Parser;
 using services::parser::Deparser;
+using services::parser::Parser;
 using std::string;
 using std::vector;
 
-namespace  services {
+namespace services {
 // Receive a register request and tell the user whether theu are regited
 // successfully through status
 // const RegisterRequest* request: resgister name,
@@ -68,8 +68,8 @@ auto ServiceImpl::GetIdChirp(const string &id) {
 string ServiceImpl::ChirpStringMaker(const string &username, const string &text,
                                      const string &parent_id) {
   auto pair = id_generator_();
-  auto chirpstring = ChirpInit(username, text, 
-                               pair.second, parent_id, pair.first);
+  auto chirpstring =
+      ChirpInit(username, text, pair.second, parent_id, pair.first);
   return chirpstring;
 }
 // chirp
@@ -202,8 +202,9 @@ Status ServiceImpl::monitor(ServerContext *context,
       auto chirp_time = curr_chirp.timestamp();
       if (chirp_time.useconds() > curr) {
         std::unique_lock<mutex> monitor_lk(monitor_mutex_);
-        if(buff_mode_){
-          monitor_buf_signal_.wait(monitor_lk, [this] { return !monitor_flag_; });
+        if (buff_mode_) {
+          monitor_buf_signal_.wait(monitor_lk,
+                                   [this] { return !monitor_flag_; });
         }
         MonitorReply monitoreply;
         MonitorSet(&monitoreply, curr_chirp);
@@ -230,7 +231,7 @@ Status ServiceImpl::monitor(ServerContext *context,
 // create a new threed to buffer const MonitorReply* reply Chirp data
 // vector<Chirp>& buffer is going to buffer Chirp data
 std::thread ServiceImpl::MonitorBuffer(const MonitorReply *reply,
-                                vector<Chirp> &buffer) {
+                                       vector<Chirp> &buffer) {
   // it will wake up this thread
   auto lock_cond = [this] { return exit_flag_ || monitor_flag_; };
   std::thread thr([this, reply, lock_cond, &buffer] {
@@ -247,23 +248,27 @@ std::thread ServiceImpl::MonitorBuffer(const MonitorReply *reply,
   });
   return thr;
 }
-void ServiceImpl::ChirpSet(ChirpReply* reply, const Chirp& reply_chirp){
+void ServiceImpl::ChirpSet(ChirpReply *reply, const Chirp &reply_chirp) {
   reply->mutable_chirp()->set_id(reply_chirp.id());
   reply->mutable_chirp()->set_username(reply_chirp.username());
   reply->mutable_chirp()->set_text(reply_chirp.text());
   reply->mutable_chirp()->set_parent_id(reply_chirp.parent_id());
-  reply->mutable_chirp()->mutable_timestamp()->set_seconds(reply_chirp.timestamp().seconds());
-  reply->mutable_chirp()->mutable_timestamp()->set_useconds(reply_chirp.timestamp().useconds());
+  reply->mutable_chirp()->mutable_timestamp()->set_seconds(
+      reply_chirp.timestamp().seconds());
+  reply->mutable_chirp()->mutable_timestamp()->set_useconds(
+      reply_chirp.timestamp().useconds());
 }
-void ServiceImpl::MonitorSet(MonitorReply* reply, const Chirp& reply_chirp){
+void ServiceImpl::MonitorSet(MonitorReply *reply, const Chirp &reply_chirp) {
   reply->mutable_chirp()->set_id(reply_chirp.id());
   reply->mutable_chirp()->set_username(reply_chirp.username());
   reply->mutable_chirp()->set_text(reply_chirp.text());
   reply->mutable_chirp()->set_parent_id(reply_chirp.parent_id());
-  reply->mutable_chirp()->mutable_timestamp()->set_seconds(reply_chirp.timestamp().seconds());
-  reply->mutable_chirp()->mutable_timestamp()->set_useconds(reply_chirp.timestamp().useconds());
+  reply->mutable_chirp()->mutable_timestamp()->set_seconds(
+      reply_chirp.timestamp().seconds());
+  reply->mutable_chirp()->mutable_timestamp()->set_useconds(
+      reply_chirp.timestamp().useconds());
 }
-} // namespace services
+}  // namespace services
 
 void RunServer() {
   std::string server_address{"0.0.0.0:50002"};
