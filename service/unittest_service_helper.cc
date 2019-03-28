@@ -1,11 +1,21 @@
-#include "service_helper.h"
-#include <chrono>
 #include <gtest/gtest.h>
+#include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
-using namespace parser;
+#include "service_helper.h"
+#include "unique_id.h"
+using helper::chirpInit;
+using helper::StringToChirp;
+using Id::IdGenerator;
+using parser::Deparser;
+using parser::Parser;
+using std::cout;
+using std::endl;
+using std::string;
+using std::unordered_set;
+using std::vector;
 
 // test whether parser and deparser can be used to the empty string and empty
 // vector
@@ -27,8 +37,6 @@ TEST(test, add) {
   auto vec1 = Deparser(str1);
   ASSERT_EQ(vec, vec1);
 }
-using namespace helper;
-using namespace std;
 IdGenerator idG;
 // parse username, text, pair , pid into a chirp string and convert it back to
 // see whether it can be converted successfully
@@ -44,22 +52,21 @@ TEST(test, chirpInit) {
   ASSERT_EQ(text, chirp.text());
   ASSERT_EQ(pid, chirp.parent_id());
   ASSERT_EQ(pair.second, chirp.id());
+}
+// Test whether chirp-string conversion works
+TEST(test, chirpstring) {
+  auto username = "Smith";
+  auto text = "Hello World";
+  auto pair = idG();
+  auto pid = "-1";
+  auto str = chirpInit(username, text, pair.second, pid, pair.first);
+  Chirp chirp;
+  chirp.ParseFromString(str);
   Chirp *chirp2 = StringToChirp(str);
   ASSERT_EQ(chirp2->username(), chirp.username());
   ASSERT_EQ(chirp2->text(), chirp.text());
   ASSERT_EQ(chirp2->parent_id(), chirp.parent_id());
   ASSERT_EQ(chirp2->id(), chirp.id());
-}
-// test some cases on whether idG functor can generate diffrent ids
-TEST(test, ID_GEN) {
-  auto pair = idG();
-  cout << pair.second << endl;
-  auto pair4 = idG();
-  cout << pair4.second << endl;
-  auto pair3 = idG();
-  cout << pair3.second << endl;
-  auto pair2 = idG();
-  cout << pair2.second << endl;
 }
 // This test is not relevent to the development and should be deleted
 int main(int argc, char *argv[]) {

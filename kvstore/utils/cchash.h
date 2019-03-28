@@ -1,5 +1,5 @@
-#ifndef KVSTORE_CCHASH_H_
-#define KVSTORE_CCHASH_H_
+#ifndef KVSTORE_UTILS_CCHASH_H_
+#define KVSTORE_UTILS_CCHASH_H_
 #include <algorithm>
 #include <functional>
 #include <list>
@@ -119,4 +119,4 @@ class ConcurrentHashTable {
     return *table_[index_];
   }
 };
-#endif  // KVSTORE_CCHASH_H_
+#endif  // KVSTORE_UTILS_CCHASH_H_

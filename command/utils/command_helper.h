@@ -1,5 +1,5 @@
-#ifndef COMMAND_COMMAND_HELPER_H_
-#define COMMAND_COMMAND_HELPER_H_
+#ifndef COMMAND_UTILS_COMMAND_HELPER_H_
+#define COMMAND_UTILS_COMMAND_HELPER_H_
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
@@ -9,11 +9,10 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "../util/UnitTestStatus.h"
-#include "kvstore.grpc.pb.h"
-#include "kvstore.pb.h"
-#include "service.grpc.pb.h"
-#include "service.pb.h"
+#include "pb/kvstore.grpc.pb.h"
+#include "pb/kvstore.pb.h"
+#include "pb/service.grpc.pb.h"
+#include "pb/service.pb.h"
 
 using chirp::Chirp;
 using chirp::ChirpReply;
@@ -57,25 +56,25 @@ namespace helper {
 // Make chirp request
 static auto ChirpRequestMaker(const string& registeruser, const string& chirp,
                               const string& reply) {
-  ChirpRequest* request = new ChirpRequest;
-  request->set_username(registeruser);
-  request->set_text(chirp);
-  request->set_parent_id(reply);
+  ChirpRequest request;
+  request.set_username(registeruser);
+  request.set_text(chirp);
+  request.set_parent_id(reply);
   return request;
 }
 
 // Make follow request
 static auto FollowRequestMaker(const string& user, const string& tofollow) {
-  FollowRequest* request = new FollowRequest;
-  request->set_username(user);
-  request->set_to_follow(tofollow);
+  FollowRequest request;
+  request.set_username(user);
+  request.set_to_follow(tofollow);
   return request;
 }
 
 // Make read request
 static auto ReadRequestMaker(const string& id) {
-  auto request = new ReadRequest;
-  request->set_chirp_id(id);
+  ReadRequest request;
+  request.set_chirp_id(id);
   return request;
 }
 
@@ -105,4 +104,4 @@ static void printChirp(const Chirp& chirp) {
 }
 }  // namespace formatChirp
 
-#endif  //  COMMAND_COMMAND_HELPER_H_
+#endif  //  COMMAND_UTILS_COMMAND_HELPER_H_

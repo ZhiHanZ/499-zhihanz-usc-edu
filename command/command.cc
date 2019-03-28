@@ -1,4 +1,11 @@
 #include "command.h"
+using formatChirp::printChirp;
+using helper::ChirpRequestMaker;
+using helper::FollowRequestMaker;
+using helper::MonitorRequestMaker;
+using helper::ReadRequestMaker;
+
+static const char DEFAULT_REPLY[]{"-1"};
 // Regist a user given a username
 Status CommandClient::RegisterUser(const string &registeruser) {
   if (registeruser == "")
@@ -20,52 +27,49 @@ Chirp CommandClient::ChirpPost(const string &username, const string &chirp,
                                const string &reply) {
   ClientContext context;
   auto request = ChirpRequestMaker(username, chirp, reply);
-  auto chirply = new ChirpReply;
-  if (reply != "-1") {
+  ChirpReply chirply;
+  if (reply != DEFAULT_REPLY) {
     auto request = ReadRequestMaker(reply);
     ClientContext context;
-    ReadReply *reply = new ReadReply;
-    auto status = stub_->read(&context, *request, reply);
+    ReadReply reply;
+    auto status = stub_->read(&context, request, &reply);
     if (!status.ok()) {
       cout << "parent id not found" << endl;
-      return chirply->chirp();
+      return chirply.chirp();
     }
-    delete reply;
   }
-  auto response = stub_->chirp(&context, *request, chirply);
+  auto response = stub_->chirp(&context, request, &chirply);
   if (!response.ok()) {
     cout << response.error_message() << endl;
   }
-  return chirply->chirp();
+  return chirply.chirp();
 }
 // follow to_follow
 auto CommandClient::Follow(const string &username, const string &to_follow) {
   auto request = FollowRequestMaker(username, to_follow);
   FollowReply reply;
   ClientContext context;
-  auto status = stub_->follow(&context, *request, &reply);
+  auto status = stub_->follow(&context, request, &reply);
   return status;
 }
 // read a chirp thread
 auto CommandClient::Read(const string &id) {
   auto request = ReadRequestMaker(id);
   ClientContext context;
-  ReadReply *reply = new ReadReply;
-  auto status = stub_->read(&context, *request, reply);
+  ReadReply reply;
+  auto status = stub_->read(&context, request, &reply);
   if (!status.ok()) {
     cout << status.error_message() << endl;
   }
-  return *reply;
+  return reply;
 }
 // monitor a people
 void CommandClient::Monitor(const string &username) {
   ClientContext context;
   auto request = MonitorRequestMaker(username);
   auto stream = stub_->monitor(&context, *request);
-  MonitorReply *reply = new MonitorReply;
+  MonitorReply* reply = new MonitorReply;
   while (stream->Read(reply)) {
-    // will stream block thread and wait for response after received a response
-    // sent it to reply?
     printChirp(reply->chirp());
   }
   auto status = stream->Finish();

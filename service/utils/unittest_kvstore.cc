@@ -3,16 +3,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../kvstore/cchash.h"
-#include "kvstore.pb.h"
-#include "kvstore_client.h"
-#include "service_helper.h"
-#include "service_string.h"
-
-using chirp::GetReply;
+#include "kvstore_string.h"
 using std::string;
 
-UnitTest::UnitTestKVClient client{};
+unittest::UnitTestKVClient client{};
 // test that whether Put can put some key value pair into key value store.
 TEST(test, Put) {
   auto b1 = client.Put("test1", "val1");
