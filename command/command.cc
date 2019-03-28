@@ -68,7 +68,7 @@ void CommandClient::Monitor(const string &username) {
   ClientContext context;
   auto request = MonitorRequestMaker(username);
   auto stream = stub_->monitor(&context, *request);
-  MonitorReply* reply = new MonitorReply;
+  MonitorReply *reply = new MonitorReply;
   while (stream->Read(reply)) {
     printChirp(reply->chirp());
   }

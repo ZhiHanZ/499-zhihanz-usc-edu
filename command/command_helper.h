@@ -39,10 +39,9 @@ using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 using grpc::StatusCode;
-using std::string;
 using std::cout;
 using std::endl;
-
+using std::string;
 
 DEFINE_string(regist, "", "What username you want to use?");
 DEFINE_string(user, "", "please enter ur username");

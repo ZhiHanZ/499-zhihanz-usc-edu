@@ -1,8 +1,8 @@
 #ifndef COMMAND_COMMAND_H_
 #define COMMAND_COMMAND_H_
+#include <memory>
+#include <string>
 #include "utils/command_helper.h"
-#include<memory>
-#include<string>
 
 // Command class supports commmand line api including
 // Supports
@@ -15,7 +15,7 @@
 class CommandClient {
  public:
   explicit CommandClient(std::shared_ptr<Channel> channel)
-                        : stub_(ServiceLayer::NewStub(channel)) {}
+      : stub_(ServiceLayer::NewStub(channel)) {}
   // Register a user through given username
   // If user already registered, return StatusCode::ALREADY_EXISTS
   Status RegisterUser(const string& registeruser);
