@@ -10,7 +10,7 @@ GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 PROTOS_PATH = utils/pb/
 vpath %.proto $(PROTOS_PATH)
 all: kvstore.pb.cc service.grpc.pb.cc kvstore.grpc.pb.cc service.pb.cc command
-command: utils/pb/service.pb.o utils/pb/service.grpc.pb.o utils/pb/kvstore.pb.o utils/pb/kvstore.grpc.pb.o command.o
+command: utils/pb/service.pb.o utils/pb/service.grpc.pb.o utils/pb/kvstore.pb.o utils/pb/kvstore.grpc.pb.o utils/command_helper.o command.o
 	$(CXX) $^ $(LDFLAGS) -g -o $@
 .PRECIOUS: %.grpc.pb.cc
 service.grpc.pb.cc: utils/pb/service.proto
