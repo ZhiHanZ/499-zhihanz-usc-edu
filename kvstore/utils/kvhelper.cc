@@ -1,5 +1,5 @@
 #include "kvhelper.h"
-namespace key_val{
+namespace key_val {
 namespace helper {
 // Put given key and value to table, And if key exists, update value
 bool Put(ConcurrentHashTable<string, string> &table, const string &key,
@@ -15,8 +15,7 @@ string Get(const ConcurrentHashTable<string, string> &table,
 // 0 represents delete successful
 // -1 represents delete a key do not exists
 
-int64_t Delete(ConcurrentHashTable<string, string> &table,
-              const string &key) {
+int64_t Delete(ConcurrentHashTable<string, string> &table, const string &key) {
   if (table.Has(key)) {
     table.DeleteKey(key);
     return 0;
@@ -24,4 +23,4 @@ int64_t Delete(ConcurrentHashTable<string, string> &table,
   return -1;
 }
 }  // namespace helper
-}  // namspace key_val
+}  // namespace key_val
