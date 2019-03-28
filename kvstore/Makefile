@@ -7,16 +7,8 @@ LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
 PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
-PROTOS_PATH = ../protoc
-all: service.pb.cc kvstore.pb.cc unittest_cchash unittest_kvhelper kvstore
-kvstore.grpc.pb.cc: ../protoc/kvstore.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
-service.grpc.pb.cc: ../protoc/service.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
-kvstore.pb.cc: ../protoc/kvstore.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=. $<
-service.pb.cc: ../protoc/service.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=. $<
+PROTOS_PATH = utils/pb/
+all: kvstore.pb.cc kvstore.grpc.pb.cc kvstore
 vpath %.proto $(PROTOS_PATH)
 unittest_kvhelper: unittest_kvhelper.o
 	$(CXX) -o unittest_kvhelper unittest_kvhelper.o -lpthread -lgtest
@@ -30,10 +22,15 @@ test: kvstore.pb.o kvstore.grpc.pb.o test.o service.grpc.pb.o service.pb.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 client: kvstore.pb.o kvstore.grpc.pb.o client.o service.pb.o
 	$(CXX) $^ $(LDFLAGS) -o $@
-kvstore: kvstore.pb.o kvstore.grpc.pb.o kvstore.o
+kvstore: utils/kvhelper.o utils/pb/kvstore.pb.o utils/pb/kvstore.grpc.pb.o kvstore.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 kvstore.o: kvstore.cc
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $^
 .PRECIOUS: %.grpc.pb.cc
+kvstore.grpc.pb.cc: utils/pb/kvstore.proto
+	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=utils/pb/. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+.PRECIOUS: %.pb.cc
+kvstore.pb.cc: utils/pb/kvstore.proto
+	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=utils/pb/. $<
 clean:
 	rm *.o unittest_cchash unittest_kvhelper *.pb.cc

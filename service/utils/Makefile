@@ -9,7 +9,7 @@ GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 PROTOS_PATH = pb/
 vpath %.proto $(PROTOS_PATH)
-all: kvstore.pb.cc service.grpc.pb.cc kvstore.grpc.pb.cc service.pb.cc unittest_service_helper service
+all: kvstore.pb.cc service.grpc.pb.cc kvstore.grpc.pb.cc service.pb.cc unittest_service_helper unittest_service_helper unittest_parser unittest_kvstore
 service: service.o service.pb.o service.grpc.pb.o kvstore.pb.o kvstore.grpc.pb.o
 	$(CXX) $^ $(LDFLAGS) -g -o $@
 unittest_parser: unittest_parser.o
