@@ -9,7 +9,7 @@ GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 PROTOS_PATH = utils/pb/
 vpath %.proto $(PROTOS_PATH)
-all: service unittest_service
+all: service.pb.cc service.grpc.pb.cc kvstore.grpc.pb.cc kvstore.pb.cc service unittest_service
 service: service.o utils/unique_id.o utils/kvstore_client.o utils/service_helper.o utils/pb/service.pb.o utils/pb/service.grpc.pb.o utils/pb/kvstore.pb.o utils/pb/kvstore.grpc.pb.o
 	$(CXX) $^ $(LDFLAGS) -g -o $@
 unittest_service: service_string.o utils/kvstore_string.o utils/service_helper.o utils/pb/service.pb.o utils/service_helper.o utils/unique_id.o unittest_service.o
