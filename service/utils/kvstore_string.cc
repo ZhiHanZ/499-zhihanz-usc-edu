@@ -1,9 +1,9 @@
-#include"kvstore_string.h"
+#include "kvstore_string.h"
 #include <string>
 using std::string;
 namespace unittest {
 
-bool UnitTestKVClient::PutOrUpdate(const std::string &key, 
+bool UnitTestKVClient::PutOrUpdate(const std::string &key,
                                    const std::string &value) {
   table_.AddOrUpdate(key, value);
   return true;
@@ -19,10 +19,12 @@ string UnitTestKVClient::GetValue(const std::string &key) const {
   return response;
 }
 // return whether key value store has such key
-bool UnitTestKVClient::Has(const std::string &key) const { return table_.Has(key); }
+bool UnitTestKVClient::Has(const std::string &key) const {
+  return table_.Has(key);
+}
 // delete corresponding key value pair through key
 bool UnitTestKVClient::Delete(std::string key) {
   table_.DeleteKey(key);
   return true;
 }
-}
+}  // namespace unittest

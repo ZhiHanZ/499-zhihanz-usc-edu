@@ -10,7 +10,7 @@ using chirp::Chirp;
 
 namespace services {
 namespace service_helper {
-//prefix during service key value store communication
+// prefix during service key value store communication
 static const char USER_ID[]{"user_id: "};
 static const char USER_FOLLOWED[]{"user_followed: "};
 static const char ID_CHIRP[]{"id_chirp: "};
@@ -22,6 +22,6 @@ std::string ChirpInit(const std::string &username, const std::string &text,
                       chirp::Timestamp time);
 // Convert string to chirp pointer
 Chirp StringToChirp(const std::string &chirpstring);
-}
 }  // namespace service_helper
+}  // namespace services
 #endif  //  SERVICE_UTILS_SERVICE_HELPER_H_

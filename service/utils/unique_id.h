@@ -8,9 +8,9 @@
 #include "pb/service.pb.h"
 
 using chirp::Timestamp;
+using std::lock_guard;
 using std::mutex;
 using std::string;
-using std::lock_guard;
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 using std::chrono::seconds;
@@ -42,12 +42,14 @@ class IdGenerator {
   string GetId(int64_t machine_code);
   // functor which can accept a machine code and return
   // a std::pair<time, id>
-  auto operator()(const int64_t &machine_code = 300) -> std::pair<Timestamp, string>;
+  auto operator()(const int64_t &machine_code = 300)
+      -> std::pair<Timestamp, string>;
+
  private:
   int64_t sequence_ = 0;
   Timestamp time_;
   mutex id_mutex_;
 };
 }  // namespace chirp_id
-}  // namespace service
+}  // namespace services
 #endif  // SERVICE_UNIQUE_ID_H_

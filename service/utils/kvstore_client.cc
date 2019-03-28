@@ -1,9 +1,9 @@
 #include "kvstore_client.h"
 #include <vector>
-#include "service_helper.h"
 #include "pb/kvstore.grpc.pb.h"
 #include "pb/kvstore.pb.h"
 #include "pb/service.pb.h"
+#include "service_helper.h"
 using chirp::Chirp;
 using chirp::DeleteReply;
 using chirp::DeleteRequest;
@@ -13,7 +13,7 @@ using chirp::KeyValueStore;
 using chirp::PutReply;
 using chirp::PutRequest;
 using chirp::Timestamp;
-namespace services{
+namespace services {
 // Requests each key in the vector and displays the key and its corresponding
 // value as a pair
 void KeyValueStoreClient::GetValues(const std::vector<std::string> &keys) {
@@ -38,7 +38,8 @@ void KeyValueStoreClient::GetValues(const std::vector<std::string> &keys) {
   }
 }
 // Put or Update given key value pair to database
-Status KeyValueStoreClient::PutOrUpdate(const std::string &key, const std::string &value) {
+Status KeyValueStoreClient::PutOrUpdate(const std::string &key,
+                                        const std::string &value) {
   PutRequest request;
   request.set_key(key);
   request.set_value(value);
@@ -49,7 +50,8 @@ Status KeyValueStoreClient::PutOrUpdate(const std::string &key, const std::strin
 }
 // Put the given key value pair to database
 // If database has given key return StautusCode:;ALREADY_EXISTS status
-Status KeyValueStoreClient::Put(const std::string &key, const std::string &value) {
+Status KeyValueStoreClient::Put(const std::string &key,
+                                const std::string &value) {
   if (Has(key).ok()) {
     return Status(StatusCode::ALREADY_EXISTS, "key exists");
   }
@@ -99,5 +101,4 @@ Status KeyValueStoreClient::Delete(const std::string &key) {
   return status;
 }
 
-}  //namespace services
-
+}  // namespace services

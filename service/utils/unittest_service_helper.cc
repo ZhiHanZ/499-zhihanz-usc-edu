@@ -4,21 +4,21 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include "parser.h"
 #include "service_helper.h"
 #include "unique_id.h"
-#include "parser.h"
-using services::service_helper::ChirpInit;
-using services::service_helper::StringToChirp;
 using services::chirp_id::IdGenerator;
 using services::parser::Deparser;
 using services::parser::Parser;
+using services::service_helper::ChirpInit;
+using services::service_helper::StringToChirp;
 using std::cout;
 using std::endl;
 using std::string;
 using std::unordered_set;
 using std::vector;
 
-IdGenerator idG; 
+IdGenerator idG;
 // parse username, text, pair , pid into a chirp string and convert it back to
 // see whether it can be converted successfully
 TEST(test, chirpInit) {

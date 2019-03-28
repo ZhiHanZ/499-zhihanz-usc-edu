@@ -16,11 +16,11 @@ class UnitTestKVClient final {
   // If store has given key return false
   bool Put(const std::string &key, const std::string &value);
   // Get the value of corresponding key
-  string GetValue(const std::string &key) const; 
+  string GetValue(const std::string &key) const;
   // return whether key value store has such key
-  bool Has(const std::string &key) const; 
+  bool Has(const std::string &key) const;
   // delete corresponding key value pair through key
-  bool Delete(std::string key); 
+  bool Delete(std::string key);
 
  private:
   ConcurrentHashTable<string, string>

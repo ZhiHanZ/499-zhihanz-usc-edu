@@ -1,9 +1,9 @@
 #ifndef SERVICE_UTILS_PARSER_H_
 #define SERVICE_UTILS_PARSER_H_
-#include <vector>
-#include <string>
 #include <sstream>
-namespace services{
+#include <string>
+#include <vector>
+namespace services {
 namespace parser {
 template <typename T>
 // parsing a vector into a string delimiter is "\n"
@@ -28,6 +28,6 @@ auto Deparser(const T &string) {
   return vec;
 }
 }  // namespace parser
-} // namespace service
+}  // namespace services
 
-#endif //  SERVICE_UTILS_PARSER_H_
+#endif  //  SERVICE_UTILS_PARSER_H_
