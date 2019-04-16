@@ -50,15 +50,6 @@ auto ServiceImpl::GetUserFollowed(const string &username) {
   auto followstr = client.GetValue(USER_FOLLOWED + username);
   return parser::Deparser(followstr);
 }
-
-// Get a vector of all the chirps ever
-auto ServiceImpl::GetAllChirps() {
-  KeyValueStoreClient client(grpc::CreateChannel(
-      "localhost:50000", grpc::InsecureChannelCredentials()));
-  auto allchirpsstr = client.GetValue("this_is_where_i_store_all_the_chirps");
-  return parser::Deparser(allchirpsstr);
-}
-
 // Get the replied id vector through id
 auto ServiceImpl::GetIdReply(const string &id) {
   KeyValueStoreClient client(grpc::CreateChannel(
@@ -227,70 +218,6 @@ Status ServiceImpl::monitor(ServerContext *context,
         monitor_lk.unlock();
         monitor_buf_signal_.notify_one();
         curr = chirp_time.useconds();
-      }
-    }
-    // avoid of overflow
-    if (monitor_refresh_times_ != -1) {
-      curr_loop++;
-    }
-  }
-  // once it existed, using exit_flag_ to notify MonitorBuffer to exit.
-  std::lock_guard<std::mutex> lk(monitor_mutex_);
-  exit_flag_ = true;
-  monitor_refresh_times_ = -1;
-  monitor_buf_signal_.notify_one();
-  return Status::OK;
-}
-
-// Watching all chirps in key: "this_is_where_i_store_all_the_chirps"
-// const MonitorRequst *request contains the hashtag we want to monitor
-// once received new chirp, check if it has the requested hashtag
-// if it does, send to MonitorReply* reply
-// loop times represent the number of loops monitor want to use
-// default value of loop times is -1 represents loop forever
-// Class private variable std::mutex monitor_mutex_
-// std::condition_variable monitor_buf_signal_
-// bool monitor_flag_ and end_flag_ are used to synchronize monitor
-// and its buffer function MonitorBuffer.
-// if you want to buffer it, remeber to set buff_mode_ to be true
-// by using OpenBuffer() function
-// if you do not want to buffer them, use CloseBuffer() to close
-Status ServiceImpl::stream(ServerContext *context,
-                            const MonitorRequest *request,
-                            ServerWriter<MonitorReply> *reply) {
-  auto time_interval = refresh_timeval_;  // pick one refresh frequency
-  auto curr = GetMicroSec();
-  auto hashtag = request->hashtag();
-  int64_t curr_loop = 0;
-  // TODO: implement the GetAllChirps function
-  auto candidateChirps = GetAllChirps();
-  while (curr_loop != monitor_refresh_times_) {
-    std::this_thread::sleep_for(time_interval);
-    for (const auto &f : candidateChirps) {
-      chirp::Chirp ch;
-      ch.ParseFromString(f);
-      auto candidate_hashtag = ch.hashtag();
-      auto curr_id = GetUserId(f);
-      auto chirpstr = GetIdChirp(curr_id);
-      auto curr_chirp = StringToChirp(chirpstr);
-      auto chirp_time = curr_chirp.timestamp();
-      if (chirp_time.useconds() > curr) {
-        if(hashtag = candidate_hashtag) {
-          std::unique_lock<mutex> monitor_lk(monitor_mutex_);
-          // once buff mode is open, wait for MonitorBuffer function
-          // to finish and start to receive another reply
-          if (buff_mode_) {
-            monitor_buf_signal_.wait(monitor_lk,
-                                     [this] { return !monitor_flag_; });
-          }
-          MonitorReply monitoreply;
-          MonitorSet(&monitoreply, curr_chirp);
-          reply->Write(monitoreply);
-          monitor_flag_ = true;
-          monitor_lk.unlock();
-          monitor_buf_signal_.notify_one();
-          curr = chirp_time.useconds();
-        }
       }
     }
     // avoid of overflow
