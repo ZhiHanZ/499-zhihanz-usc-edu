@@ -75,10 +75,10 @@ auto ServiceImpl::GetIdChirp(const string &id) {
 }
 // Make Chirp string
 string ServiceImpl::ChirpStringMaker(const string &username, const string &text,
-                                     const string &parent_id) {
+                                     const string &parent_id, const string &hashtags) {
   auto pair = id_generator_();
   auto chirpstring =
-      ChirpInit(username, text, pair.second, parent_id, pair.first);
+      ChirpInit(username, text, pair.second, parent_id, pair.first, hashtags);
   return chirpstring;
 }
 // chirp
@@ -92,10 +92,11 @@ Status ServiceImpl::chirp(ServerContext *context, const ChirpRequest *request,
   if (!has_or_not.ok())
     return Status(StatusCode::NOT_FOUND, "user name do not exists");
   auto chirpstring = ChirpStringMaker(request->username(), request->text(),
-                                      request->parent_id());
+                                      request->parent_id(), request->hashtags());
   auto reply_chirp = StringToChirp(chirpstring);
   ChirpSet(reply, reply_chirp);
   auto id_chirp = client.Put(ID_CHIRP + reply_chirp.id(), chirpstring);
+  client.Put("this_is_where_i_store_all_the_chirps", chirpstring);
   if (!id_chirp.ok())
     return Status(StatusCode::ALREADY_EXISTS, "ID confliction!");
   auto user_id =
@@ -260,7 +261,7 @@ Status ServiceImpl::stream(ServerContext *context,
                             ServerWriter<MonitorReply> *reply) {
   auto time_interval = refresh_timeval_;  // pick one refresh frequency
   auto curr = GetMicroSec();
-  auto hashtag = request->hashtag();
+  auto hashtag = request->username();
   int64_t curr_loop = 0;
   // TODO: implement the GetAllChirps function
   auto candidateChirps = GetAllChirps();
@@ -269,13 +270,13 @@ Status ServiceImpl::stream(ServerContext *context,
     for (const auto &f : candidateChirps) {
       chirp::Chirp ch;
       ch.ParseFromString(f);
-      auto candidate_hashtag = ch.hashtag();
+      auto candidate_hashtag = ch.hashtags();
       auto curr_id = GetUserId(f);
       auto chirpstr = GetIdChirp(curr_id);
       auto curr_chirp = StringToChirp(chirpstr);
       auto chirp_time = curr_chirp.timestamp();
       if (chirp_time.useconds() > curr) {
-        if(hashtag = candidate_hashtag) {
+        if(hashtag == candidate_hashtag) {
           std::unique_lock<mutex> monitor_lk(monitor_mutex_);
           // once buff mode is open, wait for MonitorBuffer function
           // to finish and start to receive another reply

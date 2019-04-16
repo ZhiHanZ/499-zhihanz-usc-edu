@@ -12,13 +12,14 @@ namespace service_helper {
 // convert username, text, id, parent_id to chirp
 std::string ChirpInit(const std::string &username, const std::string &text,
                       const std::string &id, const std::string &pid,
-                      Timestamp time) {
+                      Timestamp time, const std::string &hashtags) {
   std::string chirpstring;
   Chirp chirp{};  // using unique_ptr in here produce bugs!
   chirp.set_username(username);
   chirp.set_text(text);
   chirp.set_id(id);
   chirp.set_parent_id(pid);
+  chirp.set_hashtags(hashtags);
   chirp.mutable_timestamp()->set_seconds(time.seconds());
   chirp.mutable_timestamp()->set_useconds(time.useconds());
   chirp.SerializeToString(&chirpstring);

@@ -29,6 +29,7 @@ message ChirpRequest {
   string username = 1;
   string text = 2;  // The contents of the new chirp to be posted.
   bytes parent_id = 3;  // The ID of the chirp this is in response to.
+  string hashtags = 4; // The chirp's hashtags (separated by spaces)
 }
 
 message ChirpReply {

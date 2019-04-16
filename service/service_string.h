@@ -84,10 +84,10 @@ class FakeService final {
   }
   // make a chirp string through username, text and parent_id
   string ChirpStringMaker(const string &username, const string &text,
-                          const string &parent_id) {
+                          const string &parent_id, const string &hashtags) {
     auto pair = id_generator_();
     auto chirpstring =
-        ChirpInit(username, text, pair.second, parent_id, pair.first);
+        ChirpInit(username, text, pair.second, parent_id, pair.first, hashtags);
     return chirpstring;
   }
   auto GetNumMonitorLoop() { return monitor_refresh_times_; }

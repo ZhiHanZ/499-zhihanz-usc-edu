@@ -76,7 +76,7 @@ FakeCode FakeService::chirp(const ChirpRequest *request, ChirpReply *reply,
   auto has_or_not = client.Has(USER_ID + request->username());
   if (has_or_not == false) return FakeCode{NOT_FOUND};
   auto chirpstring = ChirpStringMaker(request->username(), request->text(),
-                                      request->parent_id());
+                                      request->parent_id(), request->hashtags());
   auto reply_chirp = StringToChirp(chirpstring);
   ChirpSet(reply, reply_chirp);
   auto id_chirp = client.Put(ID_CHIRP + reply_chirp.id(), chirpstring);

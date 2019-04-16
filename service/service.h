@@ -94,6 +94,8 @@ class ServiceImpl final : public ServiceLayer::Service {
   // Get all users that the given username followed and return a vector of
   // followed people
   auto GetUserFollowed(const string &username);
+  // Get all chirps in the databse
+  auto GetAllChirps();
   // Get all replied chirp is through the given chirp id and return a vector of
   // replied chirp id
   auto GetIdReply(const string &id);
@@ -101,7 +103,7 @@ class ServiceImpl final : public ServiceLayer::Service {
   auto GetIdChirp(const string &id);
   // Make a chirpstring given username, text, parent_id
   string ChirpStringMaker(const string &username, const string &text,
-                          const string &parent_id);
+                          const string &parent_id, const string &hashtag);
   // Receive username, chirp text, parent_id in request and store the chirp
   // string and relevent information to key value store
   Status chirp(ServerContext *context, const ChirpRequest *request,
@@ -129,9 +131,9 @@ class ServiceImpl final : public ServiceLayer::Service {
   // greter than 0;
   // default number represent a infinite loop and can ONLY return
   // if you press Ctrl + C
-  Status ServiceImpl::stream(ServerContext *context,
+  Status stream(ServerContext *context,
                             const MonitorRequest *request,
-                            ServerWriter<MonitorReply> *reply)
+                            ServerWriter<MonitorReply> *reply) override;
 
   // Create another thread put updated monitor reply to vector<Chirp> buffer
   // using mutex monitor_mutex_ and condition_variable monitor_buf_signal_ to
