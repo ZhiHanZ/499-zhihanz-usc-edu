@@ -14,6 +14,7 @@ message Chirp {
   bytes id = 3;  // The ID of this chirp.
   bytes parent_id = 4;  // The ID, if any, of the chirp this is in reply to.
   Timestamp timestamp = 5;  // The time this chirp was posted.
+  string hashtags = 6; // The chirp's hashtags (separated w spaces)
 }
 
 message RegisterRequest {
@@ -51,7 +52,7 @@ message ReadReply {
 }
 
 message MonitorRequest {
-  string username = 1;
+  string username = 1; // note: "username" holds hashtags in stream func
 }
 
 message MonitorReply {
@@ -64,5 +65,6 @@ service ServiceLayer {
   rpc follow (FollowRequest) returns (FollowReply) {}
   rpc read (ReadRequest) returns (ReadReply) {}
   rpc monitor (MonitorRequest) returns (stream MonitorReply) {}
+  rpc stream (MonitorRequest) returns (stream MonitorReply) {}
 }
 
