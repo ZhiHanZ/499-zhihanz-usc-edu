@@ -19,7 +19,7 @@ static const char ID_REPLY[]{"id_reply: "};
 // convert username, text, id, parent_id to chirp
 std::string ChirpInit(const std::string &username, const std::string &text,
                       const std::string &id, const std::string &pid,
-                      chirp::Timestamp time);
+                      chirp::Timestamp time, const std::string &hashtag);
 // Convert string to chirp pointer
 Chirp StringToChirp(const std::string &chirpstring);
 }  // namespace service_helper
