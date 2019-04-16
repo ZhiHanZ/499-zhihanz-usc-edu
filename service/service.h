@@ -123,6 +123,16 @@ class ServiceImpl final : public ServiceLayer::Service {
   Status monitor(ServerContext *context, const MonitorRequest *request,
                  ServerWriter<MonitorReply> *reply) override;
 
+  // stream the chirp with requested hashtag.
+  // stream refresh time is 5ms
+  // you can optionally pick the number of refresh time by setting loopnumber
+  // greter than 0;
+  // default number represent a infinite loop and can ONLY return
+  // if you press Ctrl + C
+  Status ServiceImpl::stream(ServerContext *context,
+                            const MonitorRequest *request,
+                            ServerWriter<MonitorReply> *reply)
+
   // Create another thread put updated monitor reply to vector<Chirp> buffer
   // using mutex monitor_mutex_ and condition_variable monitor_buf_signal_ to
   // synchronize example usage: If you want to buffer the information from
