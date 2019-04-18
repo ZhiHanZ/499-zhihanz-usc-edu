@@ -4,7 +4,7 @@ namespace command_helper {
 uint32_t CommandHandler(const string& regist, const string& user,
                         const string& chirp, const string& reply,
                         const string& read, const string& follow,
-                        const bool& monitor) {
+                        const bool& monitor, const string& stream) {
   if (regist != "" && user == "" && chirp == "" && reply == "" && read == "" &&
       follow == "" && monitor == false) {
     return kREGIST;
@@ -26,6 +26,9 @@ uint32_t CommandHandler(const string& regist, const string& user,
   } else if (regist == "" && user != "" && chirp == "" && follow != "" &&
              reply == "" && read == "" && monitor == false) {
     return kFOLLOW;
+  } else if (regist == "" && user !="" && chirp == "" && follow == "" &&
+             reply == "" && read == "" && monitor == false && stream != "") {
+  	return kSTREAM;
   } else {
     return kOTHERS;
   }

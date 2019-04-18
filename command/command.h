@@ -31,6 +31,8 @@ class CommandClient {
   auto Read(const string& id);
   // monitor the chirp on those people given user followed
   void Monitor(const string& username);
+  // monitor the chirps with the given hashtag
+  void Stream(const string& hashtag);
 
  private:
   std::unique_ptr<ServiceLayer::Stub> stub_;

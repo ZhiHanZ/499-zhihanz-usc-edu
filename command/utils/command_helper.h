@@ -50,11 +50,13 @@ static const uint32_t kMONITOR = 5;
 static const uint32_t kREAD = 6;
 static const uint32_t kNULL = 7;
 static const uint32_t kOTHERS = 8;
+static const uint32_t kSTREAM = 9;
+
 // switch to different case when encounter different inputs`
 uint32_t CommandHandler(const string& regist, const string& user,
                         const string& chirp, const string& reply,
                         const string& read, const string& follow,
-                        const bool& monitor);
+                        const bool& monitor, const string& stream);
 }  // namespace command_helper
 namespace helper {
 // Make chirp request
