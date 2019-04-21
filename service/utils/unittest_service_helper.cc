@@ -26,7 +26,8 @@ TEST(test, chirpInit) {
   auto text = "Hello World";
   auto pair = idG();
   auto pid = "-1";
-  auto str = ChirpInit(username, text, pair.second, pid, pair.first);
+  auto hashtag = "-1";
+  auto str = ChirpInit(username, text, pair.second, pid, pair.first, hashtag);
   Chirp chirp;
   chirp.ParseFromString(str);
   ASSERT_EQ(username, chirp.username());
@@ -40,7 +41,8 @@ TEST(test, chirpstring) {
   auto text = "Hello World";
   auto pair = idG();
   auto pid = "-1";
-  auto str = ChirpInit(username, text, pair.second, pid, pair.first);
+  auto hashtag = "-1";
+  auto str = ChirpInit(username, text, pair.second, pid, pair.first, hashtag);
   Chirp chirp;
   chirp.ParseFromString(str);
   Chirp chirp2 = StringToChirp(str);

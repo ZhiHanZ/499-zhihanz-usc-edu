@@ -22,7 +22,7 @@ class CommandClient {
   // Post a chirp based on username, chirp text, and its parent id
   // Return the posted chirp
   Chirp ChirpPost(const string& username, const string& chirp,
-                  const string& reply);
+                  const string& reply, const string& tag);
   // follow allow user to follow another one
   // return a status whether follow is successful
   auto Follow(const string& username, const string& to_follow);

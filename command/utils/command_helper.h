@@ -51,45 +51,49 @@ static const uint32_t kREAD = 6;
 static const uint32_t kNULL = 7;
 static const uint32_t kOTHERS = 8;
 static const uint32_t kSTREAM = 9;
+static const uint32_t kTAG = 10;
+static const uint32_t kREPLYANDTAG = 11;
 
 // switch to different case when encounter different inputs`
 uint32_t CommandHandler(const string& regist, const string& user,
                         const string& chirp, const string& reply,
                         const string& read, const string& follow,
-                        const bool& monitor, const string& stream);
+                        const bool& monitor, const string& stream, 
+                        const string& tag);
 }  // namespace command_helper
 namespace helper {
-// Make chirp request
-static auto ChirpRequestMaker(const string& registeruser, const string& chirp,
-                              const string& reply) {
-  ChirpRequest request;
-  request.set_username(registeruser);
-  request.set_text(chirp);
-  request.set_parent_id(reply);
-  return request;
-}
+  // Make chirp request
+  static auto ChirpRequestMaker(const string& registeruser, const string& chirp,
+                                const string& reply, const string& tag) {
+    ChirpRequest request;
+    request.set_username(registeruser);
+    request.set_text(chirp);
+    request.set_parent_id(reply);
+    request.set_hashtags(tag);
+    return request;
+  }
 
-// Make follow request
-static auto FollowRequestMaker(const string& user, const string& tofollow) {
-  FollowRequest request;
-  request.set_username(user);
-  request.set_to_follow(tofollow);
-  return request;
-}
+  // Make follow request
+  static auto FollowRequestMaker(const string& user, const string& tofollow) {
+    FollowRequest request;
+    request.set_username(user);
+    request.set_to_follow(tofollow);
+    return request;
+  }
 
-// Make read request
-static auto ReadRequestMaker(const string& id) {
-  ReadRequest request;
-  request.set_chirp_id(id);
-  return request;
-}
+  // Make read request
+  static auto ReadRequestMaker(const string& id) {
+    ReadRequest request;
+    request.set_chirp_id(id);
+    return request;
+  }
 
-// make monitor request
-static auto MonitorRequestMaker(const string& user) {
-  MonitorRequest request;
-  request.set_username(user);
-  return request;
-}
+  // make monitor request
+  static auto MonitorRequestMaker(const string& user) {
+    MonitorRequest request;
+    request.set_username(user);
+    return request;
+  }
 }  //  namespace helper
 
 namespace format {

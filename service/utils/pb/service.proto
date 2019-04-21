@@ -13,8 +13,8 @@ message Chirp {
   string text = 2;  // The contents of the chirp.
   bytes id = 3;  // The ID of this chirp.
   bytes parent_id = 4;  // The ID, if any, of the chirp this is in reply to.
-  Timestamp timestamp = 5;  // The time this chirp was posted.
-  string hashtags = 6; // The chirp's hashtags (separated w spaces)
+  string hashtags = 5; // The chirp's hashtags (separated w spaces)
+  Timestamp timestamp = 6;  // The time this chirp was posted.
 }
 
 message RegisterRequest {

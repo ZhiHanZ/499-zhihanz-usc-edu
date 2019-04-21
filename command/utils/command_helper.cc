@@ -4,7 +4,8 @@ namespace command_helper {
 uint32_t CommandHandler(const string& regist, const string& user,
                         const string& chirp, const string& reply,
                         const string& read, const string& follow,
-                        const bool& monitor, const string& stream) {
+                        const bool& monitor, const string& stream, 
+                        const string& tag) {
   if (regist != "" && user == "" && chirp == "" && reply == "" && read == "" &&
       follow == "" && monitor == false) {
     return kREGIST;
@@ -12,10 +13,10 @@ uint32_t CommandHandler(const string& regist, const string& user,
              read == "" && follow == "" && monitor == false) {
     return kNULL;
   } else if (regist == "" && user != "" && chirp != "" && reply == "" &&
-             read == "" && follow == "" && monitor == false) {
+             read == "" && follow == "" && monitor == false && tag == "") {
     return kCHIRP;
   } else if (regist == "" && user != "" && chirp != "" && reply != "" &&
-             read == "" && follow == "" && monitor == false) {
+             read == "" && follow == "" && monitor == false && tag == "") {
     return kREPLY;
   } else if (regist == "" && user == "" && chirp == "" && reply == "" &&
              read != "" && follow == "" && monitor == false) {
@@ -29,7 +30,15 @@ uint32_t CommandHandler(const string& regist, const string& user,
   } else if (regist == "" && user !="" && chirp == "" && follow == "" &&
              reply == "" && read == "" && monitor == false && stream != "") {
   	return kSTREAM;
-  } else {
+  } else if (regist == "" && user !="" && chirp != "" && follow == "" &&
+             reply != "" && read == "" && monitor == false && stream != "" 
+             && tag != "") {
+  	return kREPLYANDTAG;
+  } else if (regist == "" && user !="" && chirp != "" && follow == "" &&
+             reply == "" && read == "" && monitor == false && stream == "" 
+             && tag != "") {
+  	return kTAG;	
+  }	else {
     return kOTHERS;
   }
 }

@@ -20,6 +20,7 @@ std::string ChirpInit(const std::string &username, const std::string &text,
   chirp.set_id(id);
   chirp.set_parent_id(pid);
   chirp.set_hashtags(hashtags);
+  //std::cout << "chirping chirp: " << text << " with tags: " << hashtags;
   chirp.mutable_timestamp()->set_seconds(time.seconds());
   chirp.mutable_timestamp()->set_useconds(time.useconds());
   chirp.SerializeToString(&chirpstring);

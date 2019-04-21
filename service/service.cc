@@ -3,12 +3,14 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <iostream>
 #include "utils/parser.h"
 #include "utils/service_helper.h"
 #include "utils/unique_id.h"
 using services::chirp_id::GetMicroSec;
 using services::service_helper::ChirpInit;
 using services::service_helper::StringToChirp;
+using chirp::Timestamp;
 using std::literals::chrono_literals::operator""ms;
 using services::parser::Deparser;
 using services::parser::Parser;
@@ -75,7 +77,8 @@ auto ServiceImpl::GetIdChirp(const string &id) {
 }
 // Make Chirp string
 string ServiceImpl::ChirpStringMaker(const string &username, const string &text,
-                                     const string &parent_id, const string &hashtags) {
+                                     const string &parent_id, const string &hashtags,
+                                     Timestamp &timestamp) {
   auto pair = id_generator_();
   auto chirpstring =
       ChirpInit(username, text, pair.second, parent_id, pair.first, hashtags);
@@ -86,13 +89,25 @@ string ServiceImpl::ChirpStringMaker(const string &username, const string &text,
 // const ChirpReply* reply: contains a complete chirp object
 Status ServiceImpl::chirp(ServerContext *context, const ChirpRequest *request,
                           ChirpReply *reply) {
+  std::cout << "am i chirping?" << std::endl;
   KeyValueStoreClient client(grpc::CreateChannel(
       "localhost:50000", grpc::InsecureChannelCredentials()));
   auto has_or_not = client.Has(USER_ID + request->username());
   if (!has_or_not.ok())
     return Status(StatusCode::NOT_FOUND, "user name do not exists");
-  auto chirpstring = ChirpStringMaker(request->username(), request->text(),
-                                      request->parent_id(), request->hashtags());
+  std::cout << "PUTTING CHIRP W TAG: " << request->hashtags() << std::endl;
+  Timestamp timestamp;
+  pair<Timestamp, string> time_string_pair = ChirpStringMaker(request->username(), 
+  									  request->text(), request->parent_id(), 
+  									  request->hashtags(), &timestamp);
+  auto chirpstring = time_string_pair.second;
+  chirp::Chirp ch;
+  ch.set_username(request->username());
+  ch.set_text(request->text());
+  ch.set_parent_id(request->parent_id());
+  ch.set_hashtags(request->hashtags());
+  ch.set_Times
+  string my_formatted_chirp_string = 
   auto reply_chirp = StringToChirp(chirpstring);
   ChirpSet(reply, reply_chirp);
   auto id_chirp = client.Put(ID_CHIRP + reply_chirp.id(), chirpstring);
@@ -264,17 +279,15 @@ Status ServiceImpl::stream(ServerContext *context,
   auto hashtag = request->username();
   int64_t curr_loop = 0;
   // TODO: implement the GetAllChirps function
-  auto candidateChirps = GetAllChirps();
+  auto followed = GetAllUsers();
   while (curr_loop != monitor_refresh_times_) {
     std::this_thread::sleep_for(time_interval);
     for (const auto &f : candidateChirps) {
-      chirp::Chirp ch;
-      ch.ParseFromString(f);
-      auto candidate_hashtag = ch.hashtags();
       auto curr_id = GetUserId(f);
       auto chirpstr = GetIdChirp(curr_id);
       auto curr_chirp = StringToChirp(chirpstr);
       auto chirp_time = curr_chirp.timestamp();
+      auto candidate_hashtag = curr_chirp.hashtags();
       if (chirp_time.useconds() > curr) {
         if(hashtag == candidate_hashtag) {
           std::unique_lock<mutex> monitor_lk(monitor_mutex_);
