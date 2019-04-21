@@ -96,6 +96,7 @@ class ServiceImpl final : public ServiceLayer::Service {
   auto GetUserFollowed(const string &username);
   // Get all chirps in the databse
   auto GetAllChirps();
+  // Get all the users in the database
   auto GetAllUsers();
   // Get all replied chirp is through the given chirp id and return a vector of
   // replied chirp id
