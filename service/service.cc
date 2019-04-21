@@ -33,7 +33,7 @@ Status ServiceImpl::registeruser(ServerContext *context,
   if (client.Has(USER_ID + user).ok())
     return Status(StatusCode::ALREADY_EXISTS,
                   "This username have already used.");
-  client.PutOrUpdate("all_users", user);
+  client.Put("all_users", user);
   Status status1 = client.Put(USER_ID + user, "");
   if (!status1.ok()) return status1;
   Status status2 = client.Put(USER_FOLLOWED + user, "");
@@ -277,23 +277,41 @@ Status ServiceImpl::stream(ServerContext *context,
   auto time_interval = refresh_timeval_;  // pick one refresh frequency
   auto curr = GetMicroSec();
   auto hashtag = request->username();
+  hashtag = "#" + hashtag;
   int64_t curr_loop = 0;
   // TODO: implement the GetAllChirps function
   auto followed = GetAllUsers();
-  std::cout << "size: " << followed.size() << std::endl;
   while (curr_loop != monitor_refresh_times_) {
+  	std::cout << "NEW LOOP" << std::endl <<std::endl;
+  	std::cout << "size: " << followed.size() << std::endl;
     std::this_thread::sleep_for(time_interval);
     for (const auto &f : followed) {
       auto curr_id = GetUserId(f);
       auto chirpstr = GetIdChirp(curr_id);
       auto curr_chirp = StringToChirp(chirpstr);
       auto chirp_time = curr_chirp.timestamp();
-      auto candidate_hashtag = curr_chirp.hashtags();
+      bool match = false;
+      auto candidate_hashtags = curr_chirp.hashtags();
+      std::stringstream test(candidate_hashtags);
+			string segment;
+			vector<string> seglist;
+
+			while(std::getline(test, segment, ' '))
+			{
+			   seglist.push_back(segment);
+			}
+			for (const auto &s : seglist) {
+				std::cout << hashtag << "   -   " << s << std::endl;
+				if (hashtag == s) {
+					std::cout << "GOT TO MATCH THRU" << std::endl;
+					match = true;
+				}
+			}
       std::cout << "chirpstr: " << f << std::endl;
-      std::cout << "tagwhile: " << candidate_hashtag << std::endl;
+      std::cout << "tagwhile: " << candidate_hashtags << std::endl;
       std::cout << "chirp_time: " << chirp_time.useconds() << std::endl;
       if (chirp_time.useconds() > curr) {
-        if(hashtag == candidate_hashtag) {
+        if(match) {
           std::unique_lock<mutex> monitor_lk(monitor_mutex_);
           // once buff mode is open, wait for MonitorBuffer function
           // to finish and start to receive another reply
