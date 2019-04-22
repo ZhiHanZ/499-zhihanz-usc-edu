@@ -41,7 +41,6 @@ Status ServiceImpl::registeruser(ServerContext *context,
   if (client.Has(USER_ID + user).ok())
     return Status(StatusCode::ALREADY_EXISTS,
                   "This username have already used.");
-  std::cout << "INSERTING " << user << std::endl;
   auto users = client.GetValue("all_users");
   if (users == "") {
   	client.PutOrUpdate("all_users", user);
@@ -49,8 +48,6 @@ Status ServiceImpl::registeruser(ServerContext *context,
   	client.PutOrUpdate("all_users", users + " " + user);
   }
   users = client.GetValue("all_users");
-  std::cout << users << std::endl;
-  std::cout << std::endl;
   Status status1 = client.Put(USER_ID + user, "");
   if (!status1.ok()) return status1;
   Status status2 = client.Put(USER_FOLLOWED + user, "");
@@ -106,13 +103,11 @@ string ServiceImpl::ChirpStringMaker(const string &username, const string &text,
 // const ChirpReply* reply: contains a complete chirp object
 Status ServiceImpl::chirp(ServerContext *context, const ChirpRequest *request,
                           ChirpReply *reply) {
-  std::cout << "am i chirping?" << std::endl;
   KeyValueStoreClient client(grpc::CreateChannel(
       "localhost:50000", grpc::InsecureChannelCredentials()));
   auto has_or_not = client.Has(USER_ID + request->username());
   if (!has_or_not.ok())
     return Status(StatusCode::NOT_FOUND, "user name do not exists");
-  std::cout << "PUTTING CHIRP W TAG: " << request->hashtags() << std::endl;
   Timestamp timestamp;
   auto chirpstring = ChirpStringMaker(request->username(), 
   									  request->text(), request->parent_id(), 
@@ -267,7 +262,7 @@ Status ServiceImpl::monitor(ServerContext *context,
   return Status::OK;
 }
 
-// Watching all chirps in key: "this_is_where_i_store_all_the_chirps"
+// Watching chirps by all users
 // const MonitorRequst *request contains the hashtag we want to monitor
 // once received new chirp, check if it has the requested hashtag
 // if it does, send to MonitorReply* reply
@@ -285,19 +280,16 @@ Status ServiceImpl::stream(ServerContext *context,
                             ServerWriter<MonitorReply> *reply) {
   auto time_interval = refresh_timeval_;  // pick one refresh frequency
   auto curr = GetMicroSec();
-  auto hashtag = request->username();
+  string hashtag = request->username();
   hashtag = "#" + hashtag;
   int64_t curr_loop = 0;
   // TODO: implement the GetAllChirps function
-  auto followed = GetAllUsers();
+  string followed = GetAllUsers();
   string all_of_the_users = "";
-  std::cout << "foll size: " << followed.size() << std::endl;
   if (followed.size() != 0) {
 		all_of_the_users = followed[0];
   }
   while (curr_loop != monitor_refresh_times_) {
-  	std::cout << std::endl << "NEW LOOP" << std::endl;
-  	std::cout << "size: " << followed.size() << std::endl;
   	std::stringstream ss(all_of_the_users);
 			string usr;
 			vector<string> userlist;
@@ -322,15 +314,10 @@ Status ServiceImpl::stream(ServerContext *context,
 			   seglist.push_back(segment);
 			}
 			for (const auto &s : seglist) {
-				std::cout << hashtag << "   -   " << s << std::endl;
 				if (hashtag == s) {
-					std::cout << "GOT TO MATCH THRU" << std::endl;
 					match = true;
 				}
 			}
-      std::cout << "chirpstr: " << f << std::endl;
-      std::cout << "tagwhile: " << candidate_hashtags << std::endl;
-      std::cout << "chirp_time: " << chirp_time.useconds() << std::endl;
       if (chirp_time.useconds() > curr) {
         if(match) {
           std::unique_lock<mutex> monitor_lk(monitor_mutex_);

@@ -104,7 +104,7 @@ void CommandClient::Monitor(const string &username) {
   }
 }
 
-//stream a hashtag
+// stream a hashtag
 void CommandClient::Stream(const string &hashtag) {
   ClientContext context;
   auto request = MonitorRequestMaker(hashtag);
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
   } else if (mode == kCHIRP) {
     LOG(INFO) << "Sent a chirp post";
     auto chirpreply = client.ChirpPost(FLAGS_user, FLAGS_chirp, "-1", 
-    	"-1");
+      "-1");
     PrintChirp(chirpreply);
   } else if (mode == kREPLY) {
     LOG(INFO) << "Reply to " << FLAGS_reply;
@@ -147,12 +147,12 @@ int main(int argc, char *argv[]) {
   } else if (mode == kREPLYANDTAG) {
     LOG(INFO) << "Reply to " << FLAGS_reply << "with tag: " << FLAGS_hashtag;
     auto chirpreply = client.ChirpPost(FLAGS_user, FLAGS_chirp, FLAGS_reply, 
-    	FLAGS_hashtag);
+      FLAGS_hashtag);
     PrintChirp(chirpreply);
   } else if (mode == kTAG) {
     LOG(INFO) << "Sent a chirp post with tag: " << FLAGS_hashtag;
     auto chirpreply = client.ChirpPost(FLAGS_user, FLAGS_chirp, "-1", 
-    	FLAGS_hashtag);
+      FLAGS_hashtag);
     PrintChirp(chirpreply);
   } else if (mode == kREAD) {
     LOG(INFO) << "read chirp thread " << FLAGS_read;
