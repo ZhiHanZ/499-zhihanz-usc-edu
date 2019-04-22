@@ -24,6 +24,14 @@ namespace services {
 // return Status::OK if registration succeed;
 // return Status(StatusCode::ALREADY_EXISTS,"This username have already used.");
 // if regist name already exists;
+// Get a vector of all the chirps ever
+auto ServiceImpl::GetAllUsers() {
+  KeyValueStoreClient client(grpc::CreateChannel(
+      "localhost:50000", grpc::InsecureChannelCredentials()));
+  auto all_users = client.GetValue("all_users");
+  return parser::Deparser(all_users);
+}
+
 Status ServiceImpl::registeruser(ServerContext *context,
                                  const RegisterRequest *request,
                                  RegisterReply *reply) {
@@ -33,7 +41,16 @@ Status ServiceImpl::registeruser(ServerContext *context,
   if (client.Has(USER_ID + user).ok())
     return Status(StatusCode::ALREADY_EXISTS,
                   "This username have already used.");
-  client.Put("all_users", user);
+  std::cout << "INSERTING " << user << std::endl;
+  auto users = client.GetValue("all_users");
+  if (users == "") {
+  	client.PutOrUpdate("all_users", user);
+  } else {
+  	client.PutOrUpdate("all_users", users + " " + user);
+  }
+  users = client.GetValue("all_users");
+  std::cout << users << std::endl;
+  std::cout << std::endl;
   Status status1 = client.Put(USER_ID + user, "");
   if (!status1.ok()) return status1;
   Status status2 = client.Put(USER_FOLLOWED + user, "");
@@ -60,14 +77,6 @@ auto ServiceImpl::GetAllChirps() {
       "localhost:50000", grpc::InsecureChannelCredentials()));
   auto allchirpsstr = client.GetValue("this_is_where_i_store_all_the_chirps");
   return parser::Deparser(allchirpsstr);
-}
-
-// Get a vector of all the chirps ever
-auto ServiceImpl::GetAllUsers() {
-  KeyValueStoreClient client(grpc::CreateChannel(
-      "localhost:50000", grpc::InsecureChannelCredentials()));
-  auto all_users = client.GetValue("all_users");
-  return parser::Deparser(all_users);
 }
 
 // Get the replied id vector through id
@@ -281,11 +290,23 @@ Status ServiceImpl::stream(ServerContext *context,
   int64_t curr_loop = 0;
   // TODO: implement the GetAllChirps function
   auto followed = GetAllUsers();
+  string all_of_the_users = "";
+  std::cout << "foll size: " << followed.size() << std::endl;
+  if (followed.size() != 0) {
+		all_of_the_users = followed[0];
+  }
   while (curr_loop != monitor_refresh_times_) {
-  	std::cout << "NEW LOOP" << std::endl <<std::endl;
+  	std::cout << std::endl << "NEW LOOP" << std::endl;
   	std::cout << "size: " << followed.size() << std::endl;
+  	std::stringstream ss(all_of_the_users);
+			string usr;
+			vector<string> userlist;
+			while(std::getline(ss, usr, ' '))
+			{
+			   userlist.push_back(usr);
+			}
     std::this_thread::sleep_for(time_interval);
-    for (const auto &f : followed) {
+    for (const auto &f : userlist) {
       auto curr_id = GetUserId(f);
       auto chirpstr = GetIdChirp(curr_id);
       auto curr_chirp = StringToChirp(chirpstr);
