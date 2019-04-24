@@ -3,7 +3,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include <iostream>
 #include "utils/parser.h"
 #include "utils/service_helper.h"
 #include "utils/unique_id.h"
@@ -283,13 +282,12 @@ Status ServiceImpl::stream(ServerContext *context,
   string hashtag = request->username();
   hashtag = "#" + hashtag;
   int64_t curr_loop = 0;
-  // TODO: implement the GetAllChirps function
-  string followed = GetAllUsers();
-  string all_of_the_users = "";
-  if (followed.size() != 0) {
-		all_of_the_users = followed[0];
-  }
   while (curr_loop != monitor_refresh_times_) {
+    vector followed = GetAllUsers();
+    string all_of_the_users = "";
+    if (followed.size() != 0) {
+      all_of_the_users = followed[0];
+    }
   	std::stringstream ss(all_of_the_users);
 			string usr;
 			vector<string> userlist;

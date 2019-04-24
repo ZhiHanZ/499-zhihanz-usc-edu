@@ -86,4 +86,15 @@ In `root/command/` file
 ```
 ./command -user=Adam -monitor
 ```
-
+## How to stream a given hashtag?
+If you want to stream chirps with #fun
+In `root/command/` file
+```
+./command -user=Adam -stream="fun"
+```
+## How to chirp with a given hashtag?
+If you want to monitor Adam
+In `root/command/` file
+```
+./command -user=Adam -chirp="lets meet up" -stream="fun"
+```

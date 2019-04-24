@@ -238,6 +238,38 @@ TEST(test, monitor) {
   }
 }
 
+// test basic function of stream
+TEST(test, stream) {
+  vector<Chirp> buffer;
+  MonitorRequest monitor_request;
+  MonitorReply monitor_reply;
+  monitor_request.set_username("Smith");
+  std::thread th1(AutoChirp, std::ref(service), "Adam", 100, 3,
+                  std::ref(client));
+  //  A modified version of monitor which will automatically exit
+  //  if time passed 510 ms in here
+  auto th2 = service.MonitorBuffer(&monitor_reply, buffer);
+  service.SetNumMonitorLoop(110);
+  service.OpenBuffer();
+  service.monitor(&monitor_request, &monitor_reply, client);
+  // Set the value in promise
+  // Wait for thread to join
+  th1.join();
+  th2.join();
+  service.CloseBuffer();
+  EXPECT_EQ(3, buffer.size());
+  // it will put monitor into default value;
+  EXPECT_EQ(-1, service.GetNumMonitorLoop());
+  EXPECT_EQ(5ms, service.GetRefreshTimeVal());
+  int i = 0;
+  for (auto v : buffer) {
+    EXPECT_EQ("Adam", v.username());
+    auto textstr = "Hello World + " + std::to_string(i);
+    EXPECT_EQ(textstr, v.text());
+    i++;
+  }
+}
+
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
